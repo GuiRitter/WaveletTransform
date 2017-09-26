@@ -1,6 +1,8 @@
 package io.github.guiritter.wavelet;
 
 import static io.github.guiritter.wavelet.Math.convolution;
+import static io.github.guiritter.wavelet.Math.downsample;
+import static io.github.guiritter.wavelet.Math.upsample;
 import static java.lang.Math.sqrt;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -47,7 +49,17 @@ public final class Transform1D {
         J = 1;
         double y0[] = convolution(original, filterC);
         double y1[] = convolution(original, filterD);
-        System.out.println(Arrays.toString(y1));
+        double v0[] = downsample(y0);
+        double v1[] = downsample(y1);
+        double u0[] = upsample(v0);
+        double u1[] = upsample(v1);
+        double w0[] = convolution(u0, filterF);
+        double w1[] = convolution(u1, filterG);
+        System.out.println(Arrays.toString(w0));
+        System.out.println(Arrays.toString(w1));
+        for (int i = 0; i < w0.length; i++) {
+            System.out.println(w0[i] + w1[i]);
+        }
     }
 
     public static void main(String args[]) {

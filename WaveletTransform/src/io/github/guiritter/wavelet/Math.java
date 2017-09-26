@@ -36,4 +36,21 @@ public final class Math {
         }
         return fog;
     }
+
+    public static double[] downsample(double x[]) {
+        double y[] = new double[x.length / 2];
+        for (int i = 0; i < y.length; i++) {
+            y[i] = x[(2 * i) + 1];
+        }
+        return y;
+    }
+
+    public static double[] upsample(double x[]) {
+        double y[] = new double[2 * x.length];
+        for (int i = 0; i < x.length; i++) {
+            y[ 2 * i     ] = x[i];
+            y[(2 * i) + 1] = 0;
+        }
+        return y;
+    }
 }
