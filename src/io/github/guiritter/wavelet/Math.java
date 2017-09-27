@@ -1,5 +1,7 @@
 package io.github.guiritter.wavelet;
 
+import java.util.stream.Stream;
+
 /**
  *
  * @author Guilherme Alan Ritter
@@ -35,6 +37,10 @@ public final class Math {
             }
         }
         return fog;
+    }
+
+    public static double[] convolution(Double f[], double g[]) {
+        return convolution(Stream.of(f).mapToDouble(Double::doubleValue).toArray(), g);
     }
 
     public static double[] downsample(double x[]) {

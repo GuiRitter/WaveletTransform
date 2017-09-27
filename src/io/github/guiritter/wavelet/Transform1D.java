@@ -36,12 +36,28 @@ public final class Transform1D {
      */
     private final double filterG[];
 
-    private final double original[];
+    /**
+     * First element is the original signal.
+     */
+    private final LinkedList<Double[]> smoothList = new LinkedList<>();
 
-    private double smooth[];
+    private double vDetail[];
+
+    private double vSmooth[];
+
+    private double yDetail[];
+
+    private double ySmooth[];
+
+    private void transformForward() {
+        detailList.add(Arrays.stream(downsample(convolution(smoothList.getLast(), filterD))).boxed().toArray(Double[]::new));
+        smoothList.add(Arrays.stream(downsample(convolution(smoothList.getLast(), filterC))).boxed().toArray(Double[]::new));
+    }
 
     public Transform1D(double[] original, double[] filterC, double[] filterD, double[] filterF, double[] filterG, int J) {
-        this.original = new double[original.length]; System.arraycopy(original, 0, this.original, 0, original.length);
+        smoothList.add(new Double[original.length]);
+        detailList.add(null);
+        System.arraycopy(original, 0, smoothList.get(0), 0, original.length);
         this.filterC  = new double[filterC .length]; System.arraycopy(filterC , 0, this.filterC , 0, filterC .length);
         this.filterD  = new double[filterD .length]; System.arraycopy(filterD , 0, this.filterD , 0, filterD .length);
         this.filterF  = new double[filterF .length]; System.arraycopy(filterF , 0, this.filterF , 0, filterF .length);
