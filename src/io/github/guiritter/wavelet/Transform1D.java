@@ -45,11 +45,8 @@ public final class Transform1D {
 
     private final int JMaximum;
 
-    private double returnArrayArray[][];
+    private double returnArray[][];
 
-    /**
-     * First element is the original signal.
-     */
     private double smooth[];
 
     private double uDetail[];
@@ -59,6 +56,14 @@ public final class Transform1D {
     private double wDetail[];
 
     private double wSmooth[];
+
+    public int getJ() {
+        return detailList.size();
+    }
+
+    public int getJMaximum() {
+        return JMaximum;
+    }
 
     public void transformForward() {
         detailList.add(box(downsample(convolution(smooth, filterD))));
@@ -76,39 +81,39 @@ public final class Transform1D {
             throw new IllegalArgumentException("Required leve (" + J + ")l is higher than maximum level (" + JMaximum + ").");
         }
         if (J < 0) {
-            returnArrayArray = null;
+            returnArray = null;
         } else {
             if (J > detailList.size()) {
                 for (i = detailList.size(); i < J; i++) {
                     transformForward();
                 }
             }
-            returnArrayArray = new double[J + 1][];
+            returnArray = new double[J + 1][];
         }
         if (J == detailList.size()) {
-            returnArrayArray[0] = new double[smooth.length];
-            System.arraycopy(smooth, 0, returnArrayArray[0], 0, smooth.length);
-            for (i = 1; i < returnArrayArray.length; i++) {
-                returnArrayArray[i] = unbox(detailList.get(detailList.size() - i));
+            returnArray[0] = new double[smooth.length];
+            System.arraycopy(smooth, 0, returnArray[0], 0, smooth.length);
+            for (i = 1; i < returnArray.length; i++) {
+                returnArray[i] = unbox(detailList.get(detailList.size() - i));
             }
         } else if (J < detailList.size()) {
             for (i = detailList.size() - 1; i >= J; i--) {
                 if (i == (detailList.size() - 1)) {
                     uSmooth = upsample(smooth);
                 } else {
-                    uSmooth = upsample(returnArrayArray[0]);
+                    uSmooth = upsample(returnArray[0]);
                 }
                 uDetail = upsample(unbox(detailList.get(i)));
                 wSmooth = convolution(uSmooth, filterF);
                 wSmooth = removeTrailingFiller(wSmooth);
                 wDetail = convolution(uDetail, filterG);
-                returnArrayArray[0] = sum(wSmooth, wDetail);
+                returnArray[0] = sum(wSmooth, wDetail);
             }
-            for (i = 1; i < returnArrayArray.length; i++) {
-                returnArrayArray[i] = unbox(detailList.get(J - i));
+            for (i = 1; i < returnArray.length; i++) {
+                returnArray[i] = unbox(detailList.get(J - i));
             }
         }
-        return returnArrayArray;
+        return returnArray;
     }
 
     public Transform1D(double[] original, double[] filterC, double[] filterD, double[] filterF, double[] filterG, int J) {
@@ -156,17 +161,17 @@ public final class Transform1D {
     public static void main(String args[]) {
         double x = 1 / sqrt(2);
         Transform1D transform1D = new Transform1D(
-         TestData.signalWithNoise,
+         TestData.frequencySweep,
          new double[]{ x,  x},
          new double[]{ x, -x},
          new double[]{ x,  x},
          new double[]{-x,  x},
-         4);
+         1);
 //        transform1D.transformForward();
 //        transform1D.transformForward();
 //        transform1D.transformForward();
 //        transform1D.transformForward();
-        double transformInverse[][] = transform1D.transformInverse(8);
-        System.out.println(Arrays.deepToString(transformInverse));
+//        double transformInverse[][] = transform1D.transformInverse(1);
+//        System.out.println(Arrays.deepToString(transformInverse));
     }
 }
