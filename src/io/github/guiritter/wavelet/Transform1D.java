@@ -3,6 +3,7 @@ package io.github.guiritter.wavelet;
 import static io.github.guiritter.wavelet.Math.box;
 import static io.github.guiritter.wavelet.Math.convolution;
 import static io.github.guiritter.wavelet.Math.downsample;
+import static io.github.guiritter.wavelet.Math.removeTrailingFiller;
 import static io.github.guiritter.wavelet.Math.sum;
 import static io.github.guiritter.wavelet.Math.unbox;
 import static io.github.guiritter.wavelet.Math.upsample;
@@ -42,6 +43,8 @@ public final class Transform1D {
 
     private int j;
 
+    private final int JMaximum;
+
     private double returnArrayArray[][];
 
     /**
@@ -60,7 +63,7 @@ public final class Transform1D {
     public void transformForward() {
         detailList.add(box(downsample(convolution(smooth, filterD))));
         smooth = downsample(convolution(smooth, filterC));
-        /*
+        //*
         System.out.println("smooth " + detailList.size());
         System.out.println(Arrays.toString(smooth));
         System.out.println("detail " + detailList.size());
@@ -69,14 +72,19 @@ public final class Transform1D {
     }
 
     public double[][] transformInverse(int J) {
+        if (J > JMaximum) {
+            throw new IllegalArgumentException("Required leve (" + J + ")l is higher than maximum level (" + JMaximum + ").");
+        }
         if (J < 0) {
             returnArrayArray = null;
-        } else if (J > detailList.size()) {
-            for (i = detailList.size(); i < J; i++) {
-                transformForward();
+        } else {
+            if (J > detailList.size()) {
+                for (i = detailList.size(); i < J; i++) {
+                    transformForward();
+                }
             }
+            returnArrayArray = new double[J + 1][];
         }
-        returnArrayArray = new double[J + 1][];
         if (J == detailList.size()) {
             returnArrayArray[0] = new double[smooth.length];
             System.arraycopy(smooth, 0, returnArrayArray[0], 0, smooth.length);
@@ -92,6 +100,7 @@ public final class Transform1D {
                 }
                 uDetail = upsample(unbox(detailList.get(i)));
                 wSmooth = convolution(uSmooth, filterF);
+                wSmooth = removeTrailingFiller(wSmooth);
                 wDetail = convolution(uDetail, filterG);
                 returnArrayArray[0] = sum(wSmooth, wDetail);
             }
@@ -103,6 +112,19 @@ public final class Transform1D {
     }
 
     public Transform1D(double[] original, double[] filterC, double[] filterD, double[] filterF, double[] filterG, int J) {
+        if (original.length < 2) {
+            throw new IllegalArgumentException("Array must have at least two values.");
+        }
+        i = original.length;
+        j = 0;
+        while (true) {
+            i /= 2;
+            j++;
+            if (i == 1) {
+                break;
+            }
+        }
+        JMaximum = j;
              smooth = new double[original.length]; System.arraycopy(original, 0, smooth, 0, original.length);
         this.filterC = new double[filterC.length]; System.arraycopy(filterC, 0, this.filterC, 0, filterC.length);
         this.filterD = new double[filterD.length]; System.arraycopy(filterD, 0, this.filterD, 0, filterD.length);
@@ -135,16 +157,16 @@ public final class Transform1D {
         double x = 1 / sqrt(2);
         Transform1D transform1D = new Transform1D(
          TestData.signalWithNoise,
-         new double[]{x, x},
-         new double[]{x, -x},
-         new double[]{x, x},
-         new double[]{-x, x},
+         new double[]{ x,  x},
+         new double[]{ x, -x},
+         new double[]{ x,  x},
+         new double[]{-x,  x},
          4);
 //        transform1D.transformForward();
 //        transform1D.transformForward();
 //        transform1D.transformForward();
 //        transform1D.transformForward();
-        double transformInverse[][] = transform1D.transformInverse(4);
+        double transformInverse[][] = transform1D.transformInverse(8);
         System.out.println(Arrays.deepToString(transformInverse));
     }
 }

@@ -52,6 +52,12 @@ public final class Math {
         return y;
     }
 
+    public static double[] removeTrailingFiller(double x[]) {
+        double y[] = new double[x.length - 1];
+        System.arraycopy(x, 0, y, 0, y.length);
+        return y;
+    }
+
     public static double[] sum(double a[], double b[]) {
         double c[] = new double[a.length];
         for (int i = 0; i < c.length; i++) {
