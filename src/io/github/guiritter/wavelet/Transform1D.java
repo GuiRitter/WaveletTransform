@@ -3,7 +3,9 @@ package io.github.guiritter.wavelet;
 import static io.github.guiritter.wavelet.Math.box;
 import static io.github.guiritter.wavelet.Math.convolution;
 import static io.github.guiritter.wavelet.Math.downsample;
+import static io.github.guiritter.wavelet.Math.sum;
 import static io.github.guiritter.wavelet.Math.unbox;
+import static io.github.guiritter.wavelet.Math.upsample;
 import static java.lang.Math.sqrt;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -47,13 +49,13 @@ public final class Transform1D {
      */
     private double smooth[];
 
-    private double vDetail[];
+    private double uDetail[];
 
-    private double vSmooth[];
+    private double uSmooth[];
 
-    private double yDetail[];
+    private double wDetail[];
 
-    private double ySmooth[];
+    private double wSmooth[];
 
     public void transformForward() {
         detailList.add(box(downsample(convolution(smooth, filterD))));
@@ -74,15 +76,28 @@ public final class Transform1D {
                 transformForward();
             }
         }
+        returnArrayArray = new double[J + 1][];
         if (J == detailList.size()) {
-            returnArrayArray = new double[J + 1][];
             returnArrayArray[0] = new double[smooth.length];
             System.arraycopy(smooth, 0, returnArrayArray[0], 0, smooth.length);
-            for (i = 0; i < detailList.size(); i++) {
-                returnArrayArray[i + 1] = unbox(detailList.get(detailList.size() - i - 1));
+            for (i = 1; i < returnArrayArray.length; i++) {
+                returnArrayArray[i] = unbox(detailList.get(detailList.size() - i));
             }
         } else if (J < detailList.size()) {
-            // TODO
+            for (i = detailList.size() - 1; i >= J; i--) {
+                if (i == (detailList.size() - 1)) {
+                    uSmooth = upsample(smooth);
+                } else {
+                    uSmooth = upsample(returnArrayArray[0]);
+                }
+                uDetail = upsample(unbox(detailList.get(i)));
+                wSmooth = convolution(uSmooth, filterF);
+                wDetail = convolution(uDetail, filterG);
+                returnArrayArray[0] = sum(wSmooth, wDetail);
+            }
+            for (i = 1; i < returnArrayArray.length; i++) {
+                returnArrayArray[i] = unbox(detailList.get(J - i));
+            }
         }
         return returnArrayArray;
     }

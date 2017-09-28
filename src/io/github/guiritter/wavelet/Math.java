@@ -44,16 +44,20 @@ public final class Math {
         return fog;
     }
 
-    public static double[] convolution(Double f[], double g[]) {
-        return convolution(unbox(f), g);
-    }
-
     public static double[] downsample(double x[]) {
         double y[] = new double[x.length / 2];
         for (int i = 0; i < y.length; i++) {
             y[i] = x[(2 * i) + 1];
         }
         return y;
+    }
+
+    public static double[] sum(double a[], double b[]) {
+        double c[] = new double[a.length];
+        for (int i = 0; i < c.length; i++) {
+            c[i] = a[i] + b[i];
+        }
+        return c;
     }
 
     public static double[] unbox(Double boxed[]) {
