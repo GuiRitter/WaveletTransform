@@ -1,7 +1,0 @@
-t = 0 : 127;
-a = sin(((8*pi)/127)*t)
-rng default;
-b = 0.1 * (randn(length(t),1));
-length(a)
-length(a)
-plot(a+b)
