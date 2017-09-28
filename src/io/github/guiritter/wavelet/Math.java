@@ -1,5 +1,6 @@
 package io.github.guiritter.wavelet;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
@@ -7,6 +8,10 @@ import java.util.stream.Stream;
  * @author Guilherme Alan Ritter
  */
 public final class Math {
+
+    public static Double[] box(double unboxed[]) {
+        return Arrays.stream(unboxed).boxed().toArray(Double[]::new);
+    }
 
     public static double[] convolution(double f[], double g[]) {
         int N = f.length;
@@ -40,7 +45,7 @@ public final class Math {
     }
 
     public static double[] convolution(Double f[], double g[]) {
-        return convolution(Stream.of(f).mapToDouble(Double::doubleValue).toArray(), g);
+        return convolution(unbox(f), g);
     }
 
     public static double[] downsample(double x[]) {
@@ -49,6 +54,10 @@ public final class Math {
             y[i] = x[(2 * i) + 1];
         }
         return y;
+    }
+
+    public static double[] unbox(Double boxed[]) {
+        return Stream.of(boxed).mapToDouble(Double::doubleValue).toArray();
     }
 
     public static double[] upsample(double x[]) {
