@@ -45,6 +45,8 @@ public final class Transform1D {
 
     private final int JMaximum;
 
+    private final int originalSize;
+
     private double returnArray[][];
 
     private double smooth[];
@@ -65,7 +67,10 @@ public final class Transform1D {
         return JMaximum;
     }
 
-    public void transformForward() {
+    public boolean transformForward() {
+        if (detailList.size() >=  JMaximum) {
+            return false;
+        }
         detailList.add(box(downsample(convolution(smooth, filterD))));
         smooth = downsample(convolution(smooth, filterC));
         //*
@@ -74,6 +79,7 @@ public final class Transform1D {
         System.out.println("detail " + detailList.size());
         System.out.println(Arrays.toString(detailList.getLast()));
         /**/
+        return true;
     }
 
     public double[][] transformInverse(int J) {
@@ -104,10 +110,21 @@ public final class Transform1D {
                     uSmooth = upsample(returnArray[0]);
                 }
                 uDetail = upsample(unbox(detailList.get(i)));
+                if (((i == 0) && (uSmooth.length > originalSize)) || ((i != 0) && (uSmooth.length > detailList.get(i - 1).length))) {
+                    uSmooth = removeTrailingFiller(uSmooth);
+                }
+                if (((i == 0) && (uDetail.length > originalSize)) || ((i != 0) && (uDetail.length > detailList.get(i - 1).length))) {
+                    uDetail = removeTrailingFiller(uDetail);
+                }
                 wSmooth = convolution(uSmooth, filterF);
-                wSmooth = removeTrailingFiller(wSmooth);
                 wDetail = convolution(uDetail, filterG);
+                if (((i == 0) && (wSmooth.length > originalSize)) || ((i != 0) && (wDetail.length > detailList.get(i - 1).length))) {
+                    wSmooth = removeTrailingFiller(wSmooth);
+                    wDetail = removeTrailingFiller(wDetail);
+                }
                 returnArray[0] = sum(wSmooth, wDetail);
+                System.out.println("reconstructed smooth " + i);
+                System.out.println(Arrays.toString(returnArray[0]));
             }
             for (i = 1; i < returnArray.length; i++) {
                 returnArray[i] = unbox(detailList.get(J - i));
@@ -117,17 +134,19 @@ public final class Transform1D {
     }
 
     public Transform1D(double[] original, double[] filterC, double[] filterD, double[] filterF, double[] filterG, int J) {
+        originalSize = original.length;
         if (original.length < 2) {
             throw new IllegalArgumentException("Array must have at least two values.");
         }
         i = original.length;
         j = 0;
         while (true) {
+            i = i + filterC.length - 1;
             i /= 2;
-            j++;
             if (i == 1) {
                 break;
             }
+            j++;
         }
         JMaximum = j;
              smooth = new double[original.length]; System.arraycopy(original, 0, smooth, 0, original.length);
@@ -160,18 +179,43 @@ public final class Transform1D {
 
     public static void main(String args[]) {
         double x = 1 / sqrt(2);
+        //*
         Transform1D transform1D = new Transform1D(
-         TestData.frequencySweep,
+         new double[]{2, 3, 5, 7, 11, 13},
+//         TestData.signalWithNoise,
          new double[]{ x,  x},
          new double[]{ x, -x},
          new double[]{ x,  x},
          new double[]{-x,  x},
-         1);
+         10);
+        double transformInverse[][] = transform1D.transformInverse(0);
+//        System.out.println(Arrays.deepToString(transformInverse));
+        /**/
 //        transform1D.transformForward();
 //        transform1D.transformForward();
 //        transform1D.transformForward();
 //        transform1D.transformForward();
 //        double transformInverse[][] = transform1D.transformInverse(1);
 //        System.out.println(Arrays.deepToString(transformInverse));
+        /*
+        double doubleArray[];
+        Transform1D transform1D;
+        for (int sizeI = 2; sizeI < 103; sizeI++) {
+//        for (int sizeI = 8; sizeI < 9; sizeI++) {
+            doubleArray = new double[sizeI];
+            Arrays.fill(doubleArray, 0);
+            transform1D = new Transform1D(
+             doubleArray,
+             new double[]{ x,  x},
+             new double[]{ x, -x},
+             new double[]{ x,  x},
+             new double[]{-x,  x},
+             0);
+            while (transform1D.getJ() != transform1D.getJMaximum()) {
+                transform1D.transformForward();
+            }
+            System.out.println(sizeI + "\t" + transform1D.transformInverse(0)[0].length);
+        }
+        */
     }
 }
