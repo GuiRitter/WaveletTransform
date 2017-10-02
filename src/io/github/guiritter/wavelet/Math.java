@@ -44,7 +44,85 @@ public final class Math {
         return fog;
     }
 
-    public static double[] convolutionNew(double f[], double g[]) {
+    public static double[][] convolutionX(double f[][], double g[]) {
+        int N = f[0].length;
+        int M = g.length;
+        int O = N + M - 1;
+        double fog[][] = new double[f.length][O];
+        double sum;
+        int n;
+        int k;
+        int o;
+        int y;
+        if (M < N) {
+            for (y = 0; y < f.length; y++) {
+                for (n = 0; n < O; n++) {
+                    sum = 0;
+                    for (k = 0; k < M; k++) {
+                        o = n - k;
+                        sum += (((o < 0) || (o >= N)) ? 0 : f[y][o]) * g[k];
+                    }
+                    fog[y][n] = sum;
+                }
+            }
+        } else {
+            for (y = 0; y < f.length; y++) {
+                for (n = 0; n < O; n++) {
+                    sum = 0;
+                    for (k = 0; k < N; k++) {
+                        o = n - k;
+                        sum += (((o < 0) || (o >= M)) ? 0 : g[o]) * f[y][k];
+                    }
+                    fog[y][n] = sum;
+                }
+            }
+        }
+        return fog;
+    }
+
+    public static double[][] convolutionY(double f[][], double g[]) {
+        int N = f.length;
+        int M = g.length;
+        int O = N + M - 1;
+        double fog[][] = new double[O][f[0].length];
+        double sum;
+        int n;
+        int k;
+        int o;
+        int x;
+        if (M < N) {
+            for (n = 0; n < O; n++) {
+                for (x = 0; x < f[0].length; x++) {
+                    sum = 0;
+                    for (k = 0; k < M; k++) {
+                        o = n - k;
+                        sum += (((o < 0) || (o >= N)) ? 0 : f[o][x]) * g[k];
+                    }
+                    fog[n][x] = sum;
+                }
+            }
+        } else {
+            for (n = 0; n < O; n++) {
+                for (x = 0; x < f.length; x++) {
+                    sum = 0;
+                    for (k = 0; k < N; k++) {
+                        o = n - k;
+                        sum += (((o < 0) || (o >= M)) ? 0 : g[o]) * f[k][x];
+                    }
+                    fog[n][x] = sum;
+                }
+            }
+        }
+        return fog;
+    }
+
+    /**
+     * Same as MATLAB's <code>conv(a, b, 'same')</code>.
+     * @param f
+     * @param g
+     * @return
+     */
+    public static double[] convolutionSame(double f[], double g[]) {
         int N = f.length;
         int M = g.length;
         int O = N + M - 1;
@@ -93,6 +171,16 @@ public final class Math {
         return y;
     }
 
+    public static double[][] downsample(double a[][]) {
+        double b[][] = new double[a.length / 2][a[0].length / 2];
+        for (int y = 0; y < b.length; y++) {
+            for (int x = 0; x < b[y].length; x++) {
+                b[y][x] = a[(2 * y) + 1][(2 * x) + 1];
+            }
+        }
+        return b;
+    }
+
     public static double[] removeTrailingFiller(double x[]) {
         double y[] = new double[x.length - 1];
         System.arraycopy(x, 0, y, 0, y.length);
@@ -139,7 +227,7 @@ public final class Math {
                 b = divide(1, b);
                 System.out.println(i + "\t" + j);
                 System.out.println(Arrays.toString(convolution(a, b)));
-                System.out.println(Arrays.toString(convolutionNew(a, b)));
+                System.out.println(Arrays.toString(convolutionSame(a, b)));
                 System.out.println();
             }
         }

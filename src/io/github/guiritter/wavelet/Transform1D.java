@@ -133,7 +133,7 @@ public final class Transform1D {
         return returnArray;
     }
 
-    public Transform1D(double[] original, double[] filterC, double[] filterD, double[] filterF, double[] filterG, int J) {
+    public Transform1D(double original[], double filterC[], double filterD[], double filterF[], double filterG[], int J) {
         originalSize = original.length;
         if (original.length < 2) {
             throw new IllegalArgumentException("Array must have at least two values.");
