@@ -55,7 +55,7 @@ subplot(5, 2, 8); plot(d4);
 subplot(5, 2, 9); plot(s5);
 subplot(5, 2,10); plot(d5);
 %}
-%
+%{
 subplot(2, 1, 1); plot(s1);
 subplot(2, 1, 2); plot(d1);
 %}

@@ -1,6 +1,9 @@
 package io.github.guiritter.wavelet;
 
+import static io.github.guiritter.wavelet.Detail2D.CD;
+import static io.github.guiritter.wavelet.Detail2D.DC;
 import static io.github.guiritter.wavelet.Detail2D.DD;
+import static io.github.guiritter.wavelet.Transform2D.imageToMatrix;
 import java.awt.Point;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -13,12 +16,22 @@ import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.IOException;
+import static java.lang.Math.sqrt;
+import javax.imageio.ImageIO;
 
 /**
  *
  * @author Guilherme Alan Ritter
  */
 public final class Main {
+
+    private static final int detailOffset[][] = new int[][] {
+        {CD, 1, 0},
+        {DC, 0, 1},
+        {DD, 1, 1}
+    };
 
     private static int i;
 
@@ -62,17 +75,30 @@ public final class Main {
         for (i = 0; i < componentArray.length; i++) {
             for (y = 0; y < componentArray[i][0][0].length; y++) {
                 for (x = 0; x < componentArray[i][0][0][0].length; x++) {
-                    componentArray[i][0][0][y][x] /= 2.0 * ((double) J);
+                    componentArray[i][0][0][y][x] /= java.lang.Math.pow(2, J);//2.0 * ((double) J);
                 }
             }
         }
+        FitLinear fit;
+        double minimum;
+        double maximum;
         for (i = 0; i < componentArray.length; i++) {
             for (j = 1; j <= J; j++) {
                 for (k = 0; k < 3; k++) {
+                    minimum = Double.POSITIVE_INFINITY;
+                    maximum = Double.NEGATIVE_INFINITY;
                     for (y = 0; y < componentArray[i][j][k].length; y++) {
                         for (x = 0; x < componentArray[i][j][k][0].length; x++) {
-                            componentArray[i][j][k][y][x] += 2.0 * ((double) J) * 255.0;
-                            componentArray[i][j][k][y][x] /= 4.0 * ((double) J);
+                            minimum = java.lang.Math.min(minimum, componentArray[i][j][k][y][x]);
+                            maximum = java.lang.Math.max(maximum, componentArray[i][j][k][y][x]);
+//                            componentArray[i][j][k][y][x] += 2.0 * ((double) J) * 255.0;
+//                            componentArray[i][j][k][y][x] /= 4.0 * ((double) J);
+                        }
+                    }
+                    fit = new FitLinear(minimum, 0, maximum, 255);
+                    for (y = 0; y < componentArray[i][j][k].length; y++) {
+                        for (x = 0; x < componentArray[i][j][k][0].length; x++) {
+                            componentArray[i][j][k][y][x] = fit.f(componentArray[i][j][k][y][x]);
                         }
                     }
                 }
@@ -81,6 +107,7 @@ public final class Main {
     }
 
     public static final BufferedImage transform2DToImage(double componentArray[][][][][]) {
+        normalize2DImage(componentArray);
         int width = componentArray[0][0][0][0].length;
         int height = componentArray[0][0][0].length;
         for (i = 1; i < componentArray[0].length; i++) {
@@ -93,16 +120,86 @@ public final class Main {
         } else {
             image = new BufferedImage(width, height, (componentArray.length == 1) ? TYPE_BYTE_GRAY : (componentArray.length == 4) ? TYPE_INT_ARGB : TYPE_INT_RGB);
         }
-        int startX = 0;
-        int startY = 0;
+        WritableRaster raster = image.getRaster();
         int color[] = new int[componentArray.length];
         for (y = 0; y < componentArray[0][0][0].length; y++) {
             for (x = 0; x < componentArray[0][0][0][0].length; x++) {
                 for (i = 0; i < color.length; i++) {
-//                    color[i] = componentArray[0][0][0][y][x];
+                    color[i] = (int) java.lang.Math.round(componentArray[i][0][0][y][x]);
                 }
+                raster.setPixel(x, y, color);
             }
         }
+        int startX = x;
+        int startY = y;
+        for (j = 1; j < componentArray[0].length; j++) {
+            for (int offset[] : detailOffset) {
+                k = offset[0];
+                for (y = 0; y < componentArray[0][j][k].length; y++) {
+                    for (x = 0; x < componentArray[0][j][k][0].length; x++) {
+                        for (i = 0; i < color.length; i++) {
+                            color[i] = (int) java.lang.Math.round(componentArray[i][j][k][y][x]);
+                        }
+                        raster.setPixel(x + (offset[1] * startX), y + (offset[2] * startY), color);
+                    }
+                }
+            }
+            startX += x;
+            startY += y;
+        }
         return image;
+    }
+
+    public static void main(String args[]) throws IOException {
+        double a = 1 / sqrt(2);
+        //*
+        double c[] = new double[]{ a,  a};
+        double d[] = new double[]{-a,  a};
+        double f[] = new double[]{ a,  a};
+        double g[] = new double[]{ a, -a};
+        /**/
+        /*
+        double c[] = new double[]{-0.1294,  0.2241,  0.8365,  0.4830};
+        double d[] = new double[]{-0.4830,  0.8365, -0.2241, -0.1294};
+        double f[] = new double[]{ 0.4830,  0.8365,  0.2241, -0.1294};
+        double g[] = new double[]{-0.1294, -0.2241,  0.8365, -0.4830};
+        /**/
+        /*
+        double c[] = new double[]{-0.1294,  0.2241,  0.8365,  0.4830};
+        double d[] = new double[]{-0.4830,  0.8365, -0.2241, -0.1294};
+        double f[] = new double[]{ 0.4830,  0.8365,  0.2241, -0.1294};
+        double g[] = new double[]{-0.1294, -0.2241,  0.8365, -0.4830};
+        /**/
+        /*
+        double c[] = new double[]{-0.0157, -0.0727,  0.3849,  0.8526,  0.3379, -0.0727};
+        double d[] = new double[]{ 0.0727,  0.3379, -0.8526,  0.3849,  0.0727, -0.0157};
+        double f[] = new double[]{-0.0727,  0.3379,  0.8526,  0.3849, -0.0727, -0.0157};
+        double g[] = new double[]{-0.0157,  0.0727,  0.3849, -0.8526,  0.3379,  0.0727};
+        /**/
+        int b = 1;
+        String s = "C:/users/guir/documents/Lenna.png";
+//        String s = "C:/users/guir/documents/test downsampling without smoothing.png";
+        /*
+        Transform2D transform2D = new Transform2D(
+         imageToMatrix(ImageIO.read(new File(s)), 0),
+         new double[]{ a,  a},
+         new double[]{-a,  a},
+         new double[]{ a,  a},
+         new double[]{ a, -a},
+         b);
+        double componentArray[][][][][] = new double[][][][][]{transform2D.transformInverse(b)};
+        /**/
+        //*
+        Transform2D transform2D = new Transform2D(
+         imageToMatrix(ImageIO.read(new File(s)), 0), c, d, f, g, b);
+        double componentArray[][][][][] = new double[][][][][]{transform2D.transformInverse(b), null, null};
+        transform2D = new Transform2D(
+         imageToMatrix(ImageIO.read(new File(s)), 1), c, d, f, g, b);
+        componentArray[1] = transform2D.transformInverse(b);
+        transform2D = new Transform2D(
+         imageToMatrix(ImageIO.read(new File(s)), 2), c, d, f, g, b);
+        componentArray[2] = transform2D.transformInverse(b);
+        /**/
+        ImageIO.write(transform2DToImage(componentArray), "png", new File("C:/users/guir/documents/test out.png"));
     }
 }

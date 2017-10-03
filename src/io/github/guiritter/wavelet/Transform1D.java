@@ -84,7 +84,7 @@ public final class Transform1D {
 
     public double[][] transformInverse(int J) {
         if (J > JMaximum) {
-            throw new IllegalArgumentException("Required leve (" + J + ")l is higher than maximum level (" + JMaximum + ").");
+            throw new IllegalArgumentException("Requested level (" + J + ") is higher than maximum level (" + JMaximum + ").");
         }
         if (J < 0) {
             returnArray = null;
@@ -188,8 +188,8 @@ public final class Transform1D {
          new double[]{ x,  x},
          new double[]{-x,  x},
          10);
-        double transformInverse[][] = transform1D.transformInverse(0);
-//        System.out.println(Arrays.deepToString(transformInverse));
+        double transformInverse[][] = transform1D.transformInverse(2);
+        System.out.println(Arrays.deepToString(transformInverse));
         /**/
 //        transform1D.transformForward();
 //        transform1D.transformForward();

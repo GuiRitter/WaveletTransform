@@ -11,7 +11,6 @@ import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import static java.lang.Math.sqrt;
-import java.util.Arrays;
 import java.util.LinkedList;
 import javax.imageio.ImageIO;
 
@@ -103,12 +102,15 @@ public final class Transform2D {
         detailList.getLast().cd = downsample(convolutionX(temporaryC, filterD));
         detailList.getLast().dc = downsample(convolutionX(temporaryD, filterC));
         detailList.getLast().dd = downsample(convolutionX(temporaryD, filterD));
-        //*
+        /*
         System.out.println(Arrays.deepToString(smooth));
         System.out.println(Arrays.deepToString(detailList.getLast().cd));
         System.out.println(Arrays.deepToString(detailList.getLast().dc));
         System.out.println(Arrays.deepToString(detailList.getLast().dd));
         /**/
+//        if (detailList.size() == 3) {
+//            System.out.println(Arrays.deepToString(smooth));
+//        }
         return true;
     }
 
@@ -155,7 +157,7 @@ public final class Transform2D {
             y = y + filterC.length - 1;
             x /= 2;
             y /= 2;
-            if ((x == 1) || (y == 1)) {
+            if ((x <= (filterC.length - 1)) || (y <= (filterC.length - 1))) {
                 break;
             }
             i++;
