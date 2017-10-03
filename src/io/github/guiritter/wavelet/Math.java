@@ -1,5 +1,8 @@
 package io.github.guiritter.wavelet;
 
+import static java.lang.Math.ceil;
+import static java.lang.Math.max;
+import static java.lang.Math.round;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -151,7 +154,7 @@ public final class Math {
             }
         }
         double fogSame[] = new double[f.length];
-        System.arraycopy(fog, (int) java.lang.Math.round(java.lang.Math.ceil(((double) (M - 1)) / 2.0)), fogSame, 0, fogSame.length);
+        System.arraycopy(fog, (int) round(ceil(((double) (M - 1)) / 2.0)), fogSame, 0, fogSame.length);
         return fogSame;
     }
 
@@ -187,10 +190,37 @@ public final class Math {
         return y;
     }
 
+    public static double[][] removeTrailingFiller(double a[][], int maximumWidth, int maximumHeight) {
+        if ((a.length <= maximumHeight) && (a[0].length) <= maximumWidth) {
+            return a;
+        }
+        double b[][] = new double[maximumHeight][maximumWidth];
+        int x;
+        int y;
+        for (y = 0; y < maximumHeight; y++) {
+            for (x = 0; x < maximumWidth; x++) {
+                b[y][x] = a[y][x];
+            }
+        }
+        return b;
+    }
+
     public static double[] sum(double a[], double b[]) {
-        double c[] = new double[java.lang.Math.max(a.length, b.length)];
+        double c[] = new double[max(a.length, b.length)];
         for (int i = 0; i < c.length; i++) {
             c[i] = a[i] + b[i];
+        }
+        return c;
+    }
+
+    public static double[][] sum(double a[][], double b[][]) {
+        double c[][] = new double[max(a.length, b.length)][max(a[0].length, b[0].length)];
+        int x;
+        int y;
+        for (y = 0; y < c.length; y++) {
+            for (x = 0; x < c[0].length; x++) {
+                c[y][x] = a[y][x] + b[y][x];
+            }
         }
         return c;
     }
@@ -206,6 +236,21 @@ public final class Math {
             y[(2 * i) + 1] = 0;
         }
         return y;
+    }
+
+    public static double[][] upsample(double a[][]) {
+        double b[][] = new double[2 * a.length][2 * a[0].length];
+        int x;
+        int y;
+        for (y = 0; y < a.length; y++) {
+            for (x = 0; x < a[0].length; x++) {
+                b[ 2 * y     ][ 2 * x     ] = a[y][x];
+                b[ 2 * y     ][(2 * x) + 1] = 0;
+                b[(2 * y) + 1][ 2 * x     ] = 0;
+                b[(2 * y) + 1][(2 * x) + 1] = 0;
+            }
+        }
+        return b;
     }
 
     public static void main(String args[]) {

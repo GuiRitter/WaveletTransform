@@ -6,6 +6,9 @@ import static io.github.guiritter.wavelet.Detail2D.DD;
 import static io.github.guiritter.wavelet.Math.convolutionX;
 import static io.github.guiritter.wavelet.Math.convolutionY;
 import static io.github.guiritter.wavelet.Math.downsample;
+import static io.github.guiritter.wavelet.Math.removeTrailingFiller;
+import static io.github.guiritter.wavelet.Math.sum;
+import static io.github.guiritter.wavelet.Math.upsample;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
@@ -58,6 +61,22 @@ public final class Transform2D {
     private double temporaryC[][];
 
     private double temporaryD[][];
+
+    private double uDetailCD[][];
+
+    private double uDetailDC[][];
+
+    private double uDetailDD[][];
+
+    private double uSmooth[][];
+
+    private double wDetailCD[][];
+
+    private double wDetailDC[][];
+
+    private double wDetailDD[][];
+
+    private double wSmooth[][];
 
     private int x;
 
@@ -138,6 +157,27 @@ public final class Transform2D {
                 returnArray[i][DD] = matrixClone(detailList.get(detailList.size() - i).dd);
             }
         } else if (J < detailList.size()) {
+            // TODO
+            for (i = detailList.size() - 1; i >= J; i--) {
+                if (i == (detailList.size() - 1)) {
+                    uSmooth = upsample(smooth);
+                } else {
+                    uSmooth = upsample(returnArray[0][0]);
+                }
+                uDetailCD = upsample(detailList.get(i).cd);
+                uDetailDC = upsample(detailList.get(i).dc);
+                uDetailDD = upsample(detailList.get(i).dd);
+                uSmooth   = removeTrailingFiller(uSmooth  , (i == 0) ? originalSizeX : detailList.get(i - 1).dd[0].length, (i == 0) ? originalSizeY : detailList.get(i - 1).dd.length);
+                uDetailCD = removeTrailingFiller(uDetailCD, (i == 0) ? originalSizeX : detailList.get(i - 1).dd[0].length, (i == 0) ? originalSizeY : detailList.get(i - 1).dd.length);
+                uDetailDC = removeTrailingFiller(uDetailDC, (i == 0) ? originalSizeX : detailList.get(i - 1).dd[0].length, (i == 0) ? originalSizeY : detailList.get(i - 1).dd.length);
+                uDetailDD = removeTrailingFiller(uDetailDD, (i == 0) ? originalSizeX : detailList.get(i - 1).dd[0].length, (i == 0) ? originalSizeY : detailList.get(i - 1).dd.length);
+                wSmooth   = convolutionX(uSmooth  , filterF);
+                wDetailCD = convolutionX(uDetailCD, filterG);
+                wDetailDC = convolutionX(uDetailDC, filterF);
+                wDetailDD = convolutionX(uDetailDD, filterG);
+                temporaryC = sum(wSmooth  , wDetailCD);
+                temporaryD = sum(wDetailDC, wDetailDD);
+            }
             // TODO
         }
         return returnArray;

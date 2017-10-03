@@ -18,6 +18,10 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.lang.Math.pow;
+import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
 import javax.imageio.ImageIO;
 
@@ -75,7 +79,7 @@ public final class Main {
         for (i = 0; i < componentArray.length; i++) {
             for (y = 0; y < componentArray[i][0][0].length; y++) {
                 for (x = 0; x < componentArray[i][0][0][0].length; x++) {
-                    componentArray[i][0][0][y][x] /= java.lang.Math.pow(2, J);//2.0 * ((double) J);
+                    componentArray[i][0][0][y][x] /= pow(2, J);//2.0 * ((double) J);
                 }
             }
         }
@@ -89,8 +93,8 @@ public final class Main {
                     maximum = Double.NEGATIVE_INFINITY;
                     for (y = 0; y < componentArray[i][j][k].length; y++) {
                         for (x = 0; x < componentArray[i][j][k][0].length; x++) {
-                            minimum = java.lang.Math.min(minimum, componentArray[i][j][k][y][x]);
-                            maximum = java.lang.Math.max(maximum, componentArray[i][j][k][y][x]);
+                            minimum = min(minimum, componentArray[i][j][k][y][x]);
+                            maximum = max(maximum, componentArray[i][j][k][y][x]);
 //                            componentArray[i][j][k][y][x] += 2.0 * ((double) J) * 255.0;
 //                            componentArray[i][j][k][y][x] /= 4.0 * ((double) J);
                         }
@@ -125,7 +129,7 @@ public final class Main {
         for (y = 0; y < componentArray[0][0][0].length; y++) {
             for (x = 0; x < componentArray[0][0][0][0].length; x++) {
                 for (i = 0; i < color.length; i++) {
-                    color[i] = (int) java.lang.Math.round(componentArray[i][0][0][y][x]);
+                    color[i] = (int) round(componentArray[i][0][0][y][x]);
                 }
                 raster.setPixel(x, y, color);
             }
@@ -138,7 +142,7 @@ public final class Main {
                 for (y = 0; y < componentArray[0][j][k].length; y++) {
                     for (x = 0; x < componentArray[0][j][k][0].length; x++) {
                         for (i = 0; i < color.length; i++) {
-                            color[i] = (int) java.lang.Math.round(componentArray[i][j][k][y][x]);
+                            color[i] = (int) round(componentArray[i][j][k][y][x]);
                         }
                         raster.setPixel(x + (offset[1] * startX), y + (offset[2] * startY), color);
                     }
