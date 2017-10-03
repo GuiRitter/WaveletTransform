@@ -50,6 +50,10 @@ public final class Transform2D {
 
     private final int JMaximum;
 
+    private int maximumSizeX;
+
+    private int maximumSizeY;
+
     private final int originalSizeX;
 
     private final int originalSizeY;
@@ -146,9 +150,9 @@ public final class Transform2D {
                 }
             }
             returnArray = new double[J + 1][][][];
+            returnArray[0] = new double[1][][];
         }
         if (J == detailList.size()) {
-            returnArray[0] = new double[1][][];
             returnArray[0][0] = matrixClone(smooth);
             for (i = 1; i < returnArray.length; i++) {
                 returnArray[i] = new double[3][][];
@@ -157,8 +161,14 @@ public final class Transform2D {
                 returnArray[i][DD] = matrixClone(detailList.get(detailList.size() - i).dd);
             }
         } else if (J < detailList.size()) {
-            // TODO
             for (i = detailList.size() - 1; i >= J; i--) {
+                if (i == 0) {
+                    maximumSizeX = originalSizeX;
+                    maximumSizeY = originalSizeY;
+                } else {
+                    maximumSizeX = detailList.get(i - 1).dd[0].length;
+                    maximumSizeY = detailList.get(i - 1).dd.length;
+                }
                 if (i == (detailList.size() - 1)) {
                     uSmooth = upsample(smooth);
                 } else {
@@ -167,18 +177,27 @@ public final class Transform2D {
                 uDetailCD = upsample(detailList.get(i).cd);
                 uDetailDC = upsample(detailList.get(i).dc);
                 uDetailDD = upsample(detailList.get(i).dd);
-                uSmooth   = removeTrailingFiller(uSmooth  , (i == 0) ? originalSizeX : detailList.get(i - 1).dd[0].length, (i == 0) ? originalSizeY : detailList.get(i - 1).dd.length);
-                uDetailCD = removeTrailingFiller(uDetailCD, (i == 0) ? originalSizeX : detailList.get(i - 1).dd[0].length, (i == 0) ? originalSizeY : detailList.get(i - 1).dd.length);
-                uDetailDC = removeTrailingFiller(uDetailDC, (i == 0) ? originalSizeX : detailList.get(i - 1).dd[0].length, (i == 0) ? originalSizeY : detailList.get(i - 1).dd.length);
-                uDetailDD = removeTrailingFiller(uDetailDD, (i == 0) ? originalSizeX : detailList.get(i - 1).dd[0].length, (i == 0) ? originalSizeY : detailList.get(i - 1).dd.length);
+                uSmooth   = removeTrailingFiller(uSmooth  , maximumSizeX, maximumSizeY);
+                uDetailCD = removeTrailingFiller(uDetailCD, maximumSizeX, maximumSizeY);
+                uDetailDC = removeTrailingFiller(uDetailDC, maximumSizeX, maximumSizeY);
+                uDetailDD = removeTrailingFiller(uDetailDD, maximumSizeX, maximumSizeY);
                 wSmooth   = convolutionX(uSmooth  , filterF);
                 wDetailCD = convolutionX(uDetailCD, filterG);
                 wDetailDC = convolutionX(uDetailDC, filterF);
                 wDetailDD = convolutionX(uDetailDD, filterG);
                 temporaryC = sum(wSmooth  , wDetailCD);
                 temporaryD = sum(wDetailDC, wDetailDD);
+                temporaryC = convolutionY(temporaryC, filterF);
+                temporaryD = convolutionY(temporaryD, filterG);
+                /**/try {
+                returnArray[0][0] = removeTrailingFiller(sum(temporaryC, temporaryD), maximumSizeX, maximumSizeY);
+                /**/} catch (Exception ex) {
+                    System.out.println("ex");
+                }
             }
-            // TODO
+            for (i = 1; i < returnArray.length; i++) {
+                returnArray[i] = new double[][][]{detailList.get(J - i).cd, detailList.get(J - i).dc, detailList.get(J - i).dd};
+            }
         }
         return returnArray;
     }
