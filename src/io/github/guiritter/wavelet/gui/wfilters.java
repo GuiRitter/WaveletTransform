@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 public final class wfilters {
 
     public static void main(String args[]) throws IOException {
-        List<String> lineList = Files.readAllLines(Paths.get("C:\\Users\\GuiR\\Documents\\NetBeansProjects\\WaveletTransform\\src\\io\\github\\guiritter\\wavelet\\gui/filters.txt"));
+        List<String> lineList = Files.readAllLines(Paths.get("/home/guir/NetBeansProjects/WaveletTransform/src/io/github/guiritter/wavelet/gui/filters.txt"));
         int i = 0;
         LinkedList<Double> filterArray[] = new LinkedList[4];
         filterArray[0] = new LinkedList<>();

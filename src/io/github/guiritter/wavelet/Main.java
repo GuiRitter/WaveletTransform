@@ -180,10 +180,11 @@ public final class Main {
         double f[] = new double[]{-0.0727,  0.3379,  0.8526,  0.3849, -0.0727, -0.0157};
         double g[] = new double[]{-0.0157,  0.0727,  0.3849, -0.8526,  0.3379,  0.0727};
         /**/
-        int b = 3;
-        String s = "C:/users/guir/documents/Lenna.png";
+        int b = 6;
+//        String s = "C:/users/guir/documents/Lenna.png";
 //        String s = "C:/users/guir/documents/test downsampling without smoothing.png";
-        int e = 0;
+        String s = "/home/guir/Imagens/thumb-1920-262599.jpg";
+        int e = b;
         /*
         Transform2D transform2D = new Transform2D(
          imageToMatrix(ImageIO.read(new File(s)), 0),
@@ -201,7 +202,9 @@ public final class Main {
         componentArray[1] = transform2D.transformInverse(e);
         transform2D = new Transform2D(imageToMatrix(ImageIO.read(new File(s)), 2), c, d, f, g, b);
         componentArray[2] = transform2D.transformInverse(e);
+//        transform2D = new Transform2D(imageToMatrix(ImageIO.read(new File(s)), 3), c, d, f, g, b);
+//        componentArray[3] = transform2D.transformInverse(e);
         /**/
-        ImageIO.write(transform2DToImage(componentArray), "png", new File("C:/users/guir/documents/test out.png"));
+        ImageIO.write(transform2DToImage(componentArray), "png", new File("/home/guir/Imagens/test out.png"));
     }
 }
