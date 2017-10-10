@@ -184,6 +184,10 @@ public final class Math {
         return b;
     }
 
+    public static double[] parseDoubleArray(String string) {
+        return parseDoubleArray(string.split(" "));
+    }
+
     public static double[] parseDoubleArray(String stringArray[]) {
         return Stream.of(stringArray).mapToDouble(Double::parseDouble).toArray();
     }

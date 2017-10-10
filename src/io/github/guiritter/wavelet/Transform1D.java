@@ -15,7 +15,7 @@ import java.util.LinkedList;
  *
  * @author Guilherme Alan Ritter
  */
-public final class Transform1D {
+public final class Transform1D implements TransformData{
 
     private final LinkedList<Double[]> detailList = new LinkedList<>();
 
@@ -59,14 +59,17 @@ public final class Transform1D {
 
     private double wSmooth[];
 
+    @Override
     public int getJ() {
         return detailList.size();
     }
 
+    @Override
     public int getJMaximum() {
         return JMaximum;
     }
 
+    @Override
     public boolean transformForward() {
         if (detailList.size() >=  JMaximum) {
             return false;

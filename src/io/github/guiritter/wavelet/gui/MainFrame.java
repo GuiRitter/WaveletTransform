@@ -9,7 +9,6 @@ import static java.awt.GridBagConstraints.VERTICAL;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import javax.swing.JButton;
@@ -20,17 +19,30 @@ import static javax.swing.JFileChooser.FILES_ONLY;
 import javax.swing.JFrame;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import javax.swing.JTextField;
 
 /**
  *
  * @author Guilherme Alan Ritter
  */
+@SuppressWarnings("CallToPrintStackTrace")
 public abstract class MainFrame {
+
+    private final JTextField cField;
 
     private final JFileChooser chooser;
 
+    private final JTextField dField;
+
+    private final JTextField fField;
+
     final JFrame frame;
+
+    private final JTextField gField;
+
+    private final JTextField levelField;
 
     public static final int SPACE_INT;
 
@@ -40,7 +52,7 @@ public abstract class MainFrame {
 
     public static final Dimension SPACE_HALF_DIMENSION;
 
-    public abstract void onImageButtonPressed(File file);
+    public abstract void onImageButtonPressed();
 
     static {
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -65,6 +77,33 @@ public abstract class MainFrame {
         return chooser.getSelectedFile();
     }
 
+    public final String getFilterC() {
+        return cField.getText();
+    }
+
+    public final String getFilterD() {
+        return dField.getText();
+    }
+
+    public final String getFilterF() {
+        return fField.getText();
+    }
+
+    public final String getFilterG() {
+        return gField.getText();
+    }
+
+    public final String getLevel() {
+        return levelField.getText();
+    }
+
+    public final void showError(String message, Exception ex) {
+        if (ex != null) {
+            ex.printStackTrace();
+        }
+        JOptionPane.showMessageDialog(frame, message, "Error", ERROR_MESSAGE);
+    }
+
     public MainFrame() {
         chooser = new JFileChooser();
         chooser.setFileSelectionMode(FILES_ONLY);
@@ -83,12 +122,9 @@ public abstract class MainFrame {
         frame.getContentPane().add(dataButton, gridBagConstraints);
 
         JButton imageButton = new JButton("Image");
-        imageButton.addActionListener(new ActionListener() {
+        imageButton.addActionListener((ActionEvent e) -> {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onImageButtonPressed(fileOpen());
-            }
+            onImageButtonPressed();
         });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -97,10 +133,10 @@ public abstract class MainFrame {
         gridBagConstraints.insets = new Insets(SPACE_INT, SPACE_HALF_INT, SPACE_HALF_INT, SPACE_HALF_INT);
         frame.getContentPane().add(imageButton, gridBagConstraints);
 
-        final JTextField cField = new JTextField(filterItemList.getFirst().c);
-        final JTextField dField = new JTextField(filterItemList.getFirst().d);
-        final JTextField fField = new JTextField(filterItemList.getFirst().f);
-        final JTextField gField = new JTextField(filterItemList.getFirst().g);
+        cField = new JTextField(filterItemList.getFirst().c);
+        dField = new JTextField(filterItemList.getFirst().d);
+        fField = new JTextField(filterItemList.getFirst().f);
+        gField = new JTextField(filterItemList.getFirst().g);
 
         JComboBox<FilterItem> filterComboBox = new JComboBox<>();
         filterItemList.forEach((item) -> {
@@ -129,7 +165,7 @@ public abstract class MainFrame {
         gridBagConstraints.insets = new Insets(SPACE_INT, SPACE_HALF_INT, SPACE_HALF_INT, 0);
         frame.getContentPane().add(filterLabel, gridBagConstraints);
 
-        JTextField levelField = new JTextField("0000");
+        levelField = new JTextField("0000");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;

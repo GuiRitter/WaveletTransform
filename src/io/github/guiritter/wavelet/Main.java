@@ -3,6 +3,7 @@ package io.github.guiritter.wavelet;
 import static io.github.guiritter.wavelet.Detail2D.CD;
 import static io.github.guiritter.wavelet.Detail2D.DC;
 import static io.github.guiritter.wavelet.Detail2D.DD;
+import static io.github.guiritter.wavelet.Math.parseDoubleArray;
 import io.github.guiritter.wavelet.gui.MainFrame;
 import java.awt.Point;
 import java.awt.Transparency;
@@ -23,6 +24,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.pow;
 import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -208,7 +210,24 @@ public final class Main {
         final MainFrame gui = new MainFrame() {
 
             @Override
-            public void onImageButtonPressed(File file) {
+            public void onImageButtonPressed() {
+                File file = fileOpen();
+                if (file == null) {
+                    return;
+                }
+                double c[] = parseDoubleArray(getFilterC());
+                double d[] = parseDoubleArray(getFilterD());
+                double f[] = parseDoubleArray(getFilterF());
+                double g[] = parseDoubleArray(getFilterG());
+                int level = Integer.parseInt(getLevel());
+                BufferedImage image;
+                try {
+                    image = ImageIO.read(file);
+                } catch (IOException ex) {
+                    showError(ex.getLocalizedMessage(), ex);
+                    return;
+                }
+                int componentAmount = image.getRaster().getPixel(0, 0, (int[]) null).length;
             }
         };
     }

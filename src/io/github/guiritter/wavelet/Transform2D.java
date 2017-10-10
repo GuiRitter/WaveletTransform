@@ -21,7 +21,7 @@ import javax.imageio.ImageIO;
  *
  * @author Guilherme Alan Ritter
  */
-public final class Transform2D {
+public final class Transform2D implements TransformData{
 
 //    private final LinkedList<Double[][][]> detailList = new LinkedList<>();
     private final LinkedList<Detail2D> detailList = new LinkedList<>();
@@ -86,6 +86,16 @@ public final class Transform2D {
 
     private int y;
 
+    @Override
+    public int getJ() {
+        return detailList.size();
+    }
+
+    @Override
+    public int getJMaximum() {
+        return JMaximum;
+    }
+
     public static final double[][] imageToMatrix(BufferedImage image, int componentIndex) {
         double[][] doubleMatrix = new double[image.getHeight()][image.getWidth()];
         int x;
@@ -113,6 +123,7 @@ public final class Transform2D {
         return b;
     }
 
+    @Override
     public boolean transformForward() {
         if (detailList.size() >=  JMaximum) {
             return false;
