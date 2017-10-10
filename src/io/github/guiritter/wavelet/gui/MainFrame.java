@@ -1,27 +1,36 @@
 package io.github.guiritter.wavelet.gui;
 
+import static io.github.guiritter.wavelet.gui.FilterItem.filterItemList;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import static java.awt.GridBagConstraints.BOTH;
 import static java.awt.GridBagConstraints.HORIZONTAL;
 import static java.awt.GridBagConstraints.VERTICAL;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import javax.swing.BoxLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import static javax.swing.JFileChooser.FILES_ONLY;
 import javax.swing.JFrame;
+import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
  *
  * @author Guilherme Alan Ritter
  */
-public abstract class GUI {
+public abstract class MainFrame {
 
-    final JPanel panel;
+    private final JFileChooser chooser;
+
+    final JFrame frame;
 
     public static final int SPACE_INT;
 
@@ -30,6 +39,8 @@ public abstract class GUI {
     public static final int SPACE_HALF_INT;
 
     public static final Dimension SPACE_HALF_DIMENSION;
+
+    public abstract void onImageButtonPressed(File file);
 
     static {
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -46,36 +57,68 @@ public abstract class GUI {
         }
     }
 
-    public GUI() {
-        panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+    public final File fileOpen() {
+        chooser.setSelectedFile(null);
+        if (chooser.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION) {
+            return null;
+        }
+        return chooser.getSelectedFile();
+    }
+
+    public MainFrame() {
+        chooser = new JFileChooser();
+        chooser.setFileSelectionMode(FILES_ONLY);
+
+        frame = new JFrame();
+        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints gridBagConstraints;
 
-        JButton dataButton = new JButton();
-        dataButton.setText("Data");
+        JButton dataButton = new JButton("Data");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = VERTICAL;
         gridBagConstraints.insets = new Insets(SPACE_INT, SPACE_INT, SPACE_HALF_INT, SPACE_HALF_INT);
-        panel.add(dataButton, gridBagConstraints);
+        frame.getContentPane().add(dataButton, gridBagConstraints);
 
-        JButton imageButton = new JButton();
-        imageButton.setText("Image");
+        JButton imageButton = new JButton("Image");
+        imageButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onImageButtonPressed(fileOpen());
+            }
+        });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = VERTICAL;
         gridBagConstraints.insets = new Insets(SPACE_INT, SPACE_HALF_INT, SPACE_HALF_INT, SPACE_HALF_INT);
-        panel.add(imageButton, gridBagConstraints);
+        frame.getContentPane().add(imageButton, gridBagConstraints);
+
+        final JTextField cField = new JTextField(filterItemList.getFirst().c);
+        final JTextField dField = new JTextField(filterItemList.getFirst().d);
+        final JTextField fField = new JTextField(filterItemList.getFirst().f);
+        final JTextField gField = new JTextField(filterItemList.getFirst().g);
 
         JComboBox<FilterItem> filterComboBox = new JComboBox<>();
+        filterItemList.forEach((item) -> {
+            filterComboBox.addItem(item);
+        });
+        filterComboBox.addItemListener((ItemEvent e) -> {
+
+            cField.setText(filterComboBox.getItemAt(filterComboBox.getSelectedIndex()).c);
+            dField.setText(filterComboBox.getItemAt(filterComboBox.getSelectedIndex()).d);
+            fField.setText(filterComboBox.getItemAt(filterComboBox.getSelectedIndex()).f);
+            gField.setText(filterComboBox.getItemAt(filterComboBox.getSelectedIndex()).g);
+        });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = VERTICAL;
         gridBagConstraints.insets = new Insets(SPACE_INT, 0, SPACE_HALF_INT, SPACE_HALF_INT);
-        panel.add(filterComboBox, gridBagConstraints);
+        frame.getContentPane().add(filterComboBox, gridBagConstraints);
 
         JLabel filterLabel = new JLabel();
         filterLabel.setText("Filter: ");
@@ -84,15 +127,16 @@ public abstract class GUI {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = VERTICAL;
         gridBagConstraints.insets = new Insets(SPACE_INT, SPACE_HALF_INT, SPACE_HALF_INT, 0);
-        panel.add(filterLabel, gridBagConstraints);
+        frame.getContentPane().add(filterLabel, gridBagConstraints);
 
-        JTextField levelFilter = new JTextField();
+        JTextField levelField = new JTextField("0000");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = VERTICAL;
+        gridBagConstraints.fill = BOTH;
         gridBagConstraints.insets = new Insets(SPACE_INT, 0, SPACE_HALF_INT, SPACE_INT);
-        panel.add(levelFilter, gridBagConstraints);
+        gridBagConstraints.weightx = 1;
+        frame.getContentPane().add(levelField, gridBagConstraints);
 
         JLabel levelLabel = new JLabel();
         levelLabel.setText("Level: ");
@@ -102,7 +146,7 @@ public abstract class GUI {
         gridBagConstraints.fill = VERTICAL;
         gridBagConstraints.ipadx = 1;
         gridBagConstraints.insets = new Insets(SPACE_INT, SPACE_HALF_INT, SPACE_HALF_INT, 0);
-        panel.add(levelLabel, gridBagConstraints);
+        frame.getContentPane().add(levelLabel, gridBagConstraints);
 
         JLabel fLabel = new JLabel();
         fLabel.setText("F:");
@@ -112,16 +156,17 @@ public abstract class GUI {
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(SPACE_HALF_INT, SPACE_INT, 0, SPACE_INT);
-        panel.add(fLabel, gridBagConstraints);
+        gridBagConstraints.weightx = 1;
+        frame.getContentPane().add(fLabel, gridBagConstraints);
 
-        JTextField fField = new JTextField();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = HORIZONTAL;
         gridBagConstraints.insets = new Insets(0, SPACE_INT, SPACE_HALF_INT, SPACE_INT);
-        panel.add(fField, gridBagConstraints);
+        gridBagConstraints.weightx = 1;
+        frame.getContentPane().add(fField, gridBagConstraints);
 
         JLabel gLabel = new JLabel();
         gLabel.setText("G:");
@@ -131,16 +176,17 @@ public abstract class GUI {
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(SPACE_HALF_INT, SPACE_INT, 0, SPACE_INT);
-        panel.add(gLabel, gridBagConstraints);
+        gridBagConstraints.weightx = 1;
+        frame.getContentPane().add(gLabel, gridBagConstraints);
 
-        JTextField gField = new JTextField();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = HORIZONTAL;
         gridBagConstraints.insets = new Insets(0, SPACE_INT, SPACE_INT, SPACE_INT);
-        panel.add(gField, gridBagConstraints);
+        gridBagConstraints.weightx = 1;
+        frame.getContentPane().add(gField, gridBagConstraints);
 
         JLabel cLabel = new JLabel();
         cLabel.setText("C:");
@@ -150,16 +196,17 @@ public abstract class GUI {
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(SPACE_HALF_INT, SPACE_INT, 0, SPACE_INT);
-        panel.add(cLabel, gridBagConstraints);
+        gridBagConstraints.weightx = 1;
+        frame.getContentPane().add(cLabel, gridBagConstraints);
 
-        JTextField cField = new JTextField();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = HORIZONTAL;
         gridBagConstraints.insets = new Insets(0, SPACE_INT, SPACE_HALF_INT, SPACE_INT);
-        panel.add(cField, gridBagConstraints);
+        gridBagConstraints.weightx = 1;
+        frame.getContentPane().add(cField, gridBagConstraints);
 
         JLabel dLabel = new JLabel();
         dLabel.setText("D:");
@@ -169,23 +216,18 @@ public abstract class GUI {
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(SPACE_HALF_INT, SPACE_INT, 0, SPACE_INT);
-        panel.add(dLabel, gridBagConstraints);
+        gridBagConstraints.weightx = 1;
+        frame.getContentPane().add(dLabel, gridBagConstraints);
 
-        JTextField dField = new JTextField();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = HORIZONTAL;
         gridBagConstraints.insets = new Insets(0, SPACE_INT, SPACE_HALF_INT, SPACE_INT);
-        panel.add(dField, gridBagConstraints);
-    }
+        gridBagConstraints.weightx = 1;
+        frame.getContentPane().add(dField, gridBagConstraints);
 
-    public static void main(String args[]) {
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.PAGE_AXIS));
-        frame.getContentPane().add((new GUI() {}).panel);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

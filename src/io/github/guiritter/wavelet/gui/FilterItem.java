@@ -11,15 +11,15 @@ import java.util.LinkedList;
  */
 public final class FilterItem {
 
-    private final double c[];
+    public final String c;
 
-    private final double d[];
+    public final String d;
 
-    private final double f[];
+    public final String f;
 
     public static final LinkedList<FilterItem> filterItemList = new LinkedList<>();
 
-    private final double g[];
+    public final String g;
 
     public final String name;
 
@@ -39,11 +39,11 @@ public final class FilterItem {
         final int STATE_TEST = stateI++;
         int state = STATE_NAME;
         String line = null;
-        String name;
-        String c;
-        String d;
-        String f;
-        String g;
+        String name = null;
+        String c = null;
+        String d = null;
+        String f = null;
+        String g = null;
         while (true) {
             try {
                 line = reader.readLine();
@@ -74,15 +74,16 @@ public final class FilterItem {
         }
     }
 
-    public FilterItem(String name, double[] c, double[] d, double[] f, double[] g) {
+    public FilterItem(String name, String c, String d, String f, String g) {
         this.name = name;
-        this.c = new double[c.length]; System.arraycopy(c, 0, this.c, 0, c.length);
-        this.d = new double[d.length]; System.arraycopy(d, 0, this.d, 0, d.length);
-        this.f = new double[f.length]; System.arraycopy(f, 0, this.f, 0, f.length);
-        this.g = new double[g.length]; System.arraycopy(g, 0, this.g, 0, g.length);
+        this.c = c;
+        this.d = d;
+        this.f = f;
+        this.g = g;
     }
 
     public static void main(String args[]) {
-        System.out.println("yo");
+        System.out.println(filterItemList.getFirst().name);
+        System.out.println(filterItemList.getLast().name);
     }
 }

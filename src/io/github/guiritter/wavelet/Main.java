@@ -3,7 +3,7 @@ package io.github.guiritter.wavelet;
 import static io.github.guiritter.wavelet.Detail2D.CD;
 import static io.github.guiritter.wavelet.Detail2D.DC;
 import static io.github.guiritter.wavelet.Detail2D.DD;
-import static io.github.guiritter.wavelet.Transform2D.imageToMatrix;
+import io.github.guiritter.wavelet.gui.MainFrame;
 import java.awt.Point;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -23,7 +23,6 @@ import static java.lang.Math.min;
 import static java.lang.Math.pow;
 import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
-import javax.imageio.ImageIO;
 
 /**
  *
@@ -195,7 +194,7 @@ public final class Main {
          b);
         double componentArray[][][][][] = new double[][][][][]{transform2D.transformInverse(b)};
         /**/
-        //*
+        /*
         Transform2D transform2D = new Transform2D(imageToMatrix(ImageIO.read(new File(s)), 0), c, d, f, g, b);
         double componentArray[][][][][] = new double[][][][][]{transform2D.transformInverse(e), null, null};
         transform2D = new Transform2D(imageToMatrix(ImageIO.read(new File(s)), 1), c, d, f, g, b);
@@ -205,6 +204,12 @@ public final class Main {
 //        transform2D = new Transform2D(imageToMatrix(ImageIO.read(new File(s)), 3), c, d, f, g, b);
 //        componentArray[3] = transform2D.transformInverse(e);
         /**/
-        ImageIO.write(transform2DToImage(componentArray), "png", new File("/home/guir/Imagens/test out.png"));
+//        ImageIO.write(transform2DToImage(componentArray), "png", new File("/home/guir/Imagens/test out.png"));
+        final MainFrame gui = new MainFrame() {
+
+            @Override
+            public void onImageButtonPressed(File file) {
+            }
+        };
     }
 }

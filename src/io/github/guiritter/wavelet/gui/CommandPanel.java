@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import static io.github.guiritter.wavelet.gui.GUI.SPACE_DIMENSION;
+import static io.github.guiritter.wavelet.gui.MainFrame.SPACE_DIMENSION;
 
 /**
  *

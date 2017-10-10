@@ -184,6 +184,10 @@ public final class Math {
         return b;
     }
 
+    public static double[] parseDoubleArray(String stringArray[]) {
+        return Stream.of(stringArray).mapToDouble(Double::parseDouble).toArray();
+    }
+
     public static double[] removeTrailingFiller(double x[]) {
         double y[] = new double[x.length - 1];
         System.arraycopy(x, 0, y, 0, y.length);

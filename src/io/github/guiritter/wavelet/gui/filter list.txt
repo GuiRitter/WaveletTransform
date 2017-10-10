@@ -1,9 +1,3 @@
-Reverse Biorthogonal
- 'rbio1.1', 'rbio1.3', 'rbio1.5'
-'rbio2.2', 'rbio2.4', 'rbio2.6', 'rbio2.8'
-'rbio3.1', 'rbio3.3', 'rbio3.5', 'rbio3.7'
-'rbio3.9', 'rbio4.4', 'rbio5.5', 'rbio6.8'
-
 db1
 0.707106781186548 0.707106781186548
 -0.707106781186548 0.707106781186548
