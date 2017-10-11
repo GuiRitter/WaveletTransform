@@ -1,10 +1,9 @@
 package io.github.guiritter.wavelet.gui;
 
-import java.awt.image.BufferedImage;
 import javax.swing.BoxLayout;
 import static javax.swing.BoxLayout.LINE_AXIS;
 import javax.swing.JFrame;
-import static javax.swing.JFrame.EXIT_ON_CLOSE;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 /**
  *
@@ -18,11 +17,11 @@ public class TransformFrame {
 
     public TransformFrame(Object data) {
         frame = new JFrame();
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), LINE_AXIS));
 
-        if (data instanceof BufferedImage) {
-            view = new TransformView2D((BufferedImage) data);
+        if (data instanceof double[][][][][]) {
+            view = new TransformView2D((double[][][][][]) data);
         } else {
             view = null;
         }

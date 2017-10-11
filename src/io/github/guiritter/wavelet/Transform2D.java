@@ -3,14 +3,13 @@ package io.github.guiritter.wavelet;
 import static io.github.guiritter.wavelet.Detail2D.CD;
 import static io.github.guiritter.wavelet.Detail2D.DC;
 import static io.github.guiritter.wavelet.Detail2D.DD;
+import static io.github.guiritter.wavelet.Main.imageToMatrix;
 import static io.github.guiritter.wavelet.Math.convolutionX;
 import static io.github.guiritter.wavelet.Math.convolutionY;
 import static io.github.guiritter.wavelet.Math.downsample;
 import static io.github.guiritter.wavelet.Math.removeTrailingFiller;
 import static io.github.guiritter.wavelet.Math.sum;
 import static io.github.guiritter.wavelet.Math.upsample;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import static java.lang.Math.sqrt;
@@ -25,6 +24,12 @@ public final class Transform2D implements TransformData{
 
 //    private final LinkedList<Double[][][]> detailList = new LinkedList<>();
     private final LinkedList<Detail2D> detailList = new LinkedList<>();
+
+    public static final int detailOffset[][] = new int[][] {
+        {CD, 1, 0},
+        {DC, 0, 1},
+        {DD, 1, 1}
+    };
 
     /**
      * Low pass synthesis filter;
@@ -96,21 +101,6 @@ public final class Transform2D implements TransformData{
         return JMaximum;
     }
 
-    public static final double[][] imageToMatrix(BufferedImage image, int componentIndex) {
-        double[][] doubleMatrix = new double[image.getHeight()][image.getWidth()];
-        int x;
-        int y;
-        WritableRaster raster = image.getRaster();
-        int color[] = raster.getPixel(0, 0, (int[]) null);
-        for (y = 0; y < image.getHeight(); y++) {
-            for (x = 0; x < image.getWidth(); x++) {
-                raster.getPixel(x, y, color);
-                doubleMatrix[y][x] = color[componentIndex];
-            }
-        }
-        return doubleMatrix;
-    }
-
     public static final double[][] matrixClone(double a[][]) {
         int x;
         int y;
@@ -150,7 +140,7 @@ public final class Transform2D implements TransformData{
 
     public double[][][][] transformInverse(int J) {
         if (J > JMaximum) {
-            throw new IllegalArgumentException("Required leve (" + J + ")l is higher than maximum level (" + JMaximum + ").");
+            throw new IllegalArgumentException("Required level (" + J + ") is higher than maximum level (" + JMaximum + ").");
         }
         if (J < 0) {
             returnArray = null;

@@ -1,17 +1,11 @@
 package io.github.guiritter.wavelet;
 
-import static io.github.guiritter.wavelet.Detail2D.CD;
-import static io.github.guiritter.wavelet.Detail2D.DC;
-import static io.github.guiritter.wavelet.Detail2D.DD;
 import static io.github.guiritter.wavelet.Math.parseDoubleArray;
 import io.github.guiritter.wavelet.gui.MainFrame;
 import java.awt.Point;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import static java.awt.image.BufferedImage.TYPE_BYTE_GRAY;
-import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
-import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
@@ -22,8 +16,10 @@ import java.io.IOException;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.pow;
-import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
 import javax.imageio.ImageIO;
 
 /**
@@ -32,17 +28,13 @@ import javax.imageio.ImageIO;
  */
 public final class Main {
 
-    private static final int detailOffset[][] = new int[][] {
-        {CD, 1, 0},
-        {DC, 0, 1},
-        {DD, 1, 1}
-    };
-
     private static int i;
 
     private static int j;
 
     private static int k;
+
+    private static final Set<Transform> set = Collections.newSetFromMap(new WeakHashMap<Transform, Boolean>());
 
     private static int x;
 
@@ -66,6 +58,21 @@ public final class Main {
 
         // Create a custom BufferedImage with the raster and a suitable color model
         return new BufferedImage(new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_GRAY), true, false, Transparency.TRANSLUCENT, DataBuffer.TYPE_BYTE), raster, false, null);
+    }
+
+    public static final double[][] imageToMatrix(BufferedImage image, int componentIndex) {
+        double[][] doubleMatrix = new double[image.getHeight()][image.getWidth()];
+        int x;
+        int y;
+        WritableRaster raster = image.getRaster();
+        int color[] = raster.getPixel(0, 0, (int[]) null);
+        for (y = 0; y < image.getHeight(); y++) {
+            for (x = 0; x < image.getWidth(); x++) {
+                raster.getPixel(x, y, color);
+                doubleMatrix[y][x] = color[componentIndex];
+            }
+        }
+        return doubleMatrix;
     }
 
     /**
@@ -109,50 +116,6 @@ public final class Main {
                 }
             }
         }
-    }
-
-    public static final BufferedImage transform2DToImage(double componentArray[][][][][]) {
-        normalize2DImage(componentArray);
-        int width = componentArray[0][0][0][0].length;
-        int height = componentArray[0][0][0].length;
-        for (i = 1; i < componentArray[0].length; i++) {
-            width += componentArray[0][i][DD][0].length;
-            height += componentArray[0][i][DD].length;
-        }
-        BufferedImage image;
-        if (componentArray.length == 2) {
-            image = create2ByteGrayAlphaImage(width, height);
-        } else {
-            image = new BufferedImage(width, height, (componentArray.length == 1) ? TYPE_BYTE_GRAY : (componentArray.length == 4) ? TYPE_INT_ARGB : TYPE_INT_RGB);
-        }
-        WritableRaster raster = image.getRaster();
-        int color[] = new int[componentArray.length];
-        for (y = 0; y < componentArray[0][0][0].length; y++) {
-            for (x = 0; x < componentArray[0][0][0][0].length; x++) {
-                for (i = 0; i < color.length; i++) {
-                    color[i] = (int) round(componentArray[i][0][0][y][x]);
-                }
-                raster.setPixel(x, y, color);
-            }
-        }
-        int startX = x;
-        int startY = y;
-        for (j = 1; j < componentArray[0].length; j++) {
-            for (int offset[] : detailOffset) {
-                k = offset[0];
-                for (y = 0; y < componentArray[0][j][k].length; y++) {
-                    for (x = 0; x < componentArray[0][j][k][0].length; x++) {
-                        for (i = 0; i < color.length; i++) {
-                            color[i] = (int) round(componentArray[i][j][k][y][x]);
-                        }
-                        raster.setPixel(x + (offset[1] * startX), y + (offset[2] * startY), color);
-                    }
-                }
-            }
-            startX += x;
-            startY += y;
-        }
-        return image;
     }
 
     public static void main(String args[]) throws IOException {
@@ -228,6 +191,11 @@ public final class Main {
                     return;
                 }
                 int componentAmount = image.getRaster().getPixel(0, 0, (int[]) null).length;
+                TransformData transformArray[] = new TransformData[componentAmount];
+                for (int i = 0; i < componentAmount; i++) {
+                    transformArray[i] = new Transform2D(imageToMatrix(image, i), c, d, f, g, level);
+                }
+                set.add(new Transform(transformArray, level));
             }
         };
     }
