@@ -12,6 +12,8 @@ import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 import java.awt.image.WritableRaster;
 import static java.lang.Math.round;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
 
 /**
  *
@@ -20,6 +22,8 @@ import static java.lang.Math.round;
 public final class TransformView2D implements TransformView{
 
     private final ImageComponent imageComponent;
+
+    private final JPanel panel;
 
     public static final BufferedImage transform2DToImage(double componentArray[][][][][]) {
         normalize2DImage(componentArray);
@@ -68,10 +72,13 @@ public final class TransformView2D implements TransformView{
 
     public TransformView2D(double componentArray[][][][][]) {
         this.imageComponent = new ImageComponent(transform2DToImage(componentArray));
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(imageComponent);
     }
 
     @Override
     public Component getComponent() {
-        return imageComponent;
+        return panel;
     }
 }

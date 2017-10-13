@@ -43,7 +43,7 @@ public final class FilterItem {
         String c = null;
         String d = null;
         String f = null;
-        String g = null;
+        String g;
         while (true) {
             try {
                 line = reader.readLine();

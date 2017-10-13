@@ -21,7 +21,9 @@ import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
 /**
  *
@@ -42,7 +44,7 @@ public abstract class MainFrame {
 
     private final JTextField gField;
 
-    private final JTextField levelField;
+    private final JSpinner levelSpinner;
 
     public static final int SPACE_INT;
 
@@ -93,8 +95,8 @@ public abstract class MainFrame {
         return gField.getText();
     }
 
-    public final String getLevel() {
-        return levelField.getText();
+    public final int getLevel() {
+        return (int) levelSpinner.getModel().getValue();
     }
 
     public final void showError(String message, Exception ex) {
@@ -165,14 +167,14 @@ public abstract class MainFrame {
         gridBagConstraints.insets = new Insets(SPACE_INT, SPACE_HALF_INT, SPACE_HALF_INT, 0);
         frame.getContentPane().add(filterLabel, gridBagConstraints);
 
-        levelField = new JTextField("0000");
+        levelSpinner = new JSpinner(new SpinnerNumberModel(1, 0, 127, 1));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = BOTH;
         gridBagConstraints.insets = new Insets(SPACE_INT, 0, SPACE_HALF_INT, SPACE_INT);
         gridBagConstraints.weightx = 1;
-        frame.getContentPane().add(levelField, gridBagConstraints);
+        frame.getContentPane().add(levelSpinner, gridBagConstraints);
 
         JLabel levelLabel = new JLabel();
         levelLabel.setText("Level: ");

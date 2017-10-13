@@ -182,7 +182,7 @@ public final class Main {
                 double d[] = parseDoubleArray(getFilterD());
                 double f[] = parseDoubleArray(getFilterF());
                 double g[] = parseDoubleArray(getFilterG());
-                int level = Integer.parseInt(getLevel());
+                int level = getLevel();
                 BufferedImage image;
                 try {
                     image = ImageIO.read(file);
