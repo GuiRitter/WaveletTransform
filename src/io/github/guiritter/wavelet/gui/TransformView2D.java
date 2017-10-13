@@ -25,6 +25,21 @@ public final class TransformView2D implements TransformView{
 
     private final JPanel panel;
 
+    @Override
+    public BufferedImage getImage() {
+        return imageComponent.getImage();
+    }
+
+    @Override
+    public void setView(double[][] signalArray) {
+        throw new UnsupportedOperationException("Not supported for this version.");
+    }
+
+    @Override
+    public void setView(double[][][][][] componentArray) {
+        imageComponent.setImage(transform2DToImage(componentArray));
+    }
+
     public static final BufferedImage transform2DToImage(double componentArray[][][][][]) {
         normalize2DImage(componentArray);
         int width = componentArray[0][0][0][0].length;

@@ -1,6 +1,6 @@
 package io.github.guiritter.wavelet;
 
-import static io.github.guiritter.wavelet.Math.parseDoubleArray;
+import static io.github.guiritter.wavelet.DoubleMatrixParser.decode1D;
 import io.github.guiritter.wavelet.gui.MainFrame;
 import java.awt.Point;
 import java.awt.Transparency;
@@ -145,10 +145,10 @@ public final class Main {
         double g[] = new double[]{-0.0157,  0.0727,  0.3849, -0.8526,  0.3379,  0.0727};
         /**/
         int b = 6;
-//        String s = "C:/users/guir/documents/Lenna.png";
+        String s = "C:/users/guir/documents/Lenna.png";
 //        String s = "C:/users/guir/documents/test downsampling without smoothing.png";
-        String s = "/home/guir/Imagens/thumb-1920-262599.jpg";
-        int e = b;
+//        String s = "/home/guir/Imagens/thumb-1920-262599.jpg";
+        int e = 0;
         /*
         Transform2D transform2D = new Transform2D(
          imageToMatrix(ImageIO.read(new File(s)), 0),
@@ -169,7 +169,7 @@ public final class Main {
 //        transform2D = new Transform2D(imageToMatrix(ImageIO.read(new File(s)), 3), c, d, f, g, b);
 //        componentArray[3] = transform2D.transformInverse(e);
         /**/
-//        ImageIO.write(transform2DToImage(componentArray), "png", new File("/home/guir/Imagens/test out.png"));
+//        ImageIO.write(transform2DToImage(componentArray), "png", new File("C:\\Users\\GuiR\\Documents/test out " + e + ".png"));
         final MainFrame gui = new MainFrame() {
 
             @Override
@@ -178,16 +178,16 @@ public final class Main {
                 if (file == null) {
                     return;
                 }
-                double c[] = parseDoubleArray(getFilterC());
-                double d[] = parseDoubleArray(getFilterD());
-                double f[] = parseDoubleArray(getFilterF());
-                double g[] = parseDoubleArray(getFilterG());
+                double c[] = decode1D(getFilterC());
+                double d[] = decode1D(getFilterD());
+                double f[] = decode1D(getFilterF());
+                double g[] = decode1D(getFilterG());
                 int level = getLevel();
                 BufferedImage image;
                 try {
                     image = ImageIO.read(file);
                 } catch (IOException ex) {
-                    showError(ex.getLocalizedMessage(), ex);
+                    showError(frame, ex.getLocalizedMessage(), ex);
                     return;
                 }
                 int componentAmount = image.getRaster().getPixel(0, 0, (int[]) null).length;
@@ -195,7 +195,7 @@ public final class Main {
                 for (int i = 0; i < componentAmount; i++) {
                     transformArray[i] = new Transform2D(imageToMatrix(image, i), c, d, f, g, level);
                 }
-                set.add(new Transform(transformArray, level));
+                set.add(new Transform(file.getName(), transformArray, level));
             }
         };
     }

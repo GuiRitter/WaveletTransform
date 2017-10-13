@@ -115,7 +115,7 @@ public final class Transform2D implements TransformData{
 
     @Override
     public boolean transformForward() {
-        if (detailList.size() >=  JMaximum) {
+        if (detailList.size() >= JMaximum) {
             return false;
         }
         temporaryC = convolutionY(smooth, filterC);

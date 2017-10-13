@@ -1,6 +1,7 @@
 package io.github.guiritter.wavelet.gui;
 
 import static io.github.guiritter.wavelet.gui.FilterItem.filterItemList;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import static java.awt.GridBagConstraints.BOTH;
@@ -40,7 +41,7 @@ public abstract class MainFrame {
 
     private final JTextField fField;
 
-    final JFrame frame;
+    protected final JFrame frame;
 
     private final JTextField gField;
 
@@ -99,18 +100,18 @@ public abstract class MainFrame {
         return (int) levelSpinner.getModel().getValue();
     }
 
-    public final void showError(String message, Exception ex) {
+    public static final void showError(Component parent, String message, Exception ex) {
         if (ex != null) {
             ex.printStackTrace();
         }
-        JOptionPane.showMessageDialog(frame, message, "Error", ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(parent, message, "Error", ERROR_MESSAGE);
     }
 
     public MainFrame() {
         chooser = new JFileChooser();
         chooser.setFileSelectionMode(FILES_ONLY);
 
-        frame = new JFrame();
+        frame = new JFrame("Wavelet Transform");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints gridBagConstraints;

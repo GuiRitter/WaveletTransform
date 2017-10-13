@@ -20,7 +20,18 @@ import javax.swing.event.ChangeEvent;
  */
 public abstract class CommandPanel {
 
+    private final JSpinner levelSpinner;
+
     final JPanel panel;
+
+    public final void levelIncrease() {
+        ((SpinnerNumberModel) levelSpinner.getModel()).setMaximum(((int) ((SpinnerNumberModel) levelSpinner.getModel()).getMaximum()) + 1);
+        levelSpinner.setValue(((SpinnerNumberModel) levelSpinner.getModel()).getMaximum());
+    }
+
+    public abstract void onDataButtonPressed(int level);
+
+    public abstract void onImageButtonPressed();
 
     public abstract void onIncreaseButtonPressed();
 
@@ -33,17 +44,23 @@ public abstract class CommandPanel {
         JLabel label = new JLabel("level: ");
         panel.add(label);
 
-        JSpinner spinner = new JSpinner(new SpinnerNumberModel(level, 0, level, 1));
-        spinner.addChangeListener((ChangeEvent e) -> {
+        levelSpinner = new JSpinner(new SpinnerNumberModel(level, 0, level, 1));
+        levelSpinner.addChangeListener((ChangeEvent e) -> {
 
-            onLevelChanged((int) spinner.getModel().getValue());
+            for (StackTraceElement element : (new Throwable()).getStackTrace()) {
+                if (element.getMethodName().equals("setMaximum")) {
+                    return;
+                }
+            }
+            onLevelChanged((int) levelSpinner.getModel().getValue());
         });
-        panel.add(spinner);
+        panel.add(levelSpinner);
 
         panel.add(Box.createRigidArea(SPACE_DIMENSION));
 
         JButton button = new JButton("increase");
         button.addActionListener((ActionEvent e) -> {
+
             onIncreaseButtonPressed();
         });
         panel.add(button);
@@ -64,11 +81,19 @@ public abstract class CommandPanel {
         panel.add(Box.createRigidArea(SPACE_DIMENSION));
 
         button = new JButton("data");
+        button.addActionListener((ActionEvent e) -> {
+
+            onDataButtonPressed((int) levelSpinner.getModel().getValue());
+        });
         panel.add(button);
 
         panel.add(Box.createRigidArea(SPACE_DIMENSION));
 
         button = new JButton("image");
+        button.addActionListener((ActionEvent e) -> {
+
+            onImageButtonPressed();
+        });
         panel.add(button);
     }
 
@@ -77,6 +102,16 @@ public abstract class CommandPanel {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.PAGE_AXIS));
         frame.getContentPane().add((new CommandPanel(0) {
+
+            @Override
+            public void onDataButtonPressed(int level) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void onImageButtonPressed() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
 
             @Override
             public void onIncreaseButtonPressed() {
