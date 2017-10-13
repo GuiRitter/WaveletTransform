@@ -21,23 +21,43 @@ public final class Transform {
 
     private final TransformData data[];
 
+    private final boolean dimension1;
+
     private final TransformFrame frame;
 
-    public final double[][][][][] getInverseView(int J) {
+    public final double[][] getInverseView1D(int J, Double softThreshold) {
+        return ((Transform1D) data[0]).transformInverse(J, softThreshold);
+    }
+
+    public final double[][][][][] getInverseView2D(int J, Double softThreshold) {
         double componentArray[][][][][] = new double[data.length][][][][];
         for (int i = 0; i < componentArray.length; i++) {
-            componentArray[i] = ((Transform2D) data[i]).transformInverse(J);
+            componentArray[i] = ((Transform2D) data[i]).transformInverse(J, softThreshold);
         }
         return componentArray;
     }
 
+    private Double getSoftThreshold() {
+        String softThresholdString = frame.getSoftThreshold().trim();
+        if (softThresholdString.isEmpty()) {
+            return null;
+        }
+        Double softThresholdDouble = Double.parseDouble(softThresholdString);
+        if (softThresholdDouble == 0d) {
+            return null;
+        }
+        return softThresholdDouble;
+    }
+
     public Transform(String name, TransformData data[], int J) {
         this.data = Arrays.copyOf(data, data.length);
-        frame = new TransformFrame(name, getInverseView(J)) {
+        dimension1 = data[0] instanceof Transform1D;
+        frame = new TransformFrame(name, dimension1 ? getInverseView1D(J, null) : getInverseView2D(J, null)) {
 
             @Override
             public void onDataButtonPressed(int level) {
-                String data = encode(getInverseView(level));
+                Double softThreshold = Transform.this.getSoftThreshold();
+                String data = encode(dimension1 ? getInverseView1D(level, softThreshold) : getInverseView2D(level, softThreshold));
                 File file = fileSave();
                 if (file == null) {
                     return;
@@ -71,7 +91,15 @@ public final class Transform {
 
             @Override
             public void onLevelChanged(int level) {
-                setView(getInverseView(level));
+                Double softThreshold = Transform.this.getSoftThreshold();
+                setView(dimension1 ? getInverseView1D(level, softThreshold) : getInverseView2D(level, softThreshold));
+            }
+
+            @Override
+            public void onRefreshButtonPressed() {
+                Double softThreshold = Transform.this.getSoftThreshold();
+                int level = getLevel();
+                setView(dimension1 ? getInverseView1D(level, softThreshold) : getInverseView2D(level, softThreshold));
             }
         };
     }

@@ -55,6 +55,8 @@ public abstract class MainFrame {
 
     public static final Dimension SPACE_HALF_DIMENSION;
 
+    public abstract void onDataButtonPressed();
+
     public abstract void onImageButtonPressed();
 
     static {
@@ -117,6 +119,10 @@ public abstract class MainFrame {
         GridBagConstraints gridBagConstraints;
 
         JButton dataButton = new JButton("Data");
+        dataButton.addActionListener((ActionEvent e) -> {
+
+            onDataButtonPressed();
+        });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;

@@ -1,8 +1,10 @@
 package io.github.guiritter.wavelet;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
+import static java.lang.Math.signum;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -203,6 +205,24 @@ public final class Math {
             }
         }
         return b;
+    }
+
+    public static double softThreshold(double input, double threshold) {
+        return signum(input) * max(0, abs(input) - threshold);
+    }
+
+    public static double[] softThreshold(double input[], double threshold) {
+        for (int i = 0; i < input.length; i++) {
+            input[i] = softThreshold(input[i], threshold);
+        }
+        return input;
+    }
+
+    public static double[][] softThreshold(double input[][], double threshold) {
+        for (int y = 0; y < input.length; y++) {
+            input[y] = softThreshold(input[y], threshold);
+        }
+        return input;
     }
 
     public static double[] sum(double a[], double b[]) {

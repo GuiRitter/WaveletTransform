@@ -49,6 +49,27 @@ public final class DoubleMatrixParser {
         return builder.toString();
     }
 
+    public static String encode(Object matrix) {
+        if (matrix instanceof double[]) {
+            return encode((double[]) matrix);
+
+        } else if (matrix instanceof double[][]) {
+            return encode((double[][]) matrix);
+
+        } else if (matrix instanceof double[][][]) {
+            return encode((double[][][]) matrix);
+
+        } else if (matrix instanceof double[][][][]) {
+            return encode((double[][][][]) matrix);
+
+        } else if (matrix instanceof double[][][][][]) {
+            return encode((double[][][][][]) matrix);
+
+        } else {
+            throw new IllegalArgumentException("Object's type is not covered by this method.");
+        }
+    }
+
     public static double[] decode1D(String string) {
         return decode1D(string.split(" "));
     }

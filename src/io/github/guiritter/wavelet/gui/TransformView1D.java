@@ -57,6 +57,8 @@ public final class TransformView1D implements TransformView{
                 panel.add(createRigidArea(SPACE_DIMENSION));
             }
         }
+        panel.revalidate();
+        panel.repaint();
     }
 
     @Override

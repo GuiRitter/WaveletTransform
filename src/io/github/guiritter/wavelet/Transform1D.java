@@ -4,6 +4,7 @@ import static io.github.guiritter.wavelet.Math.box;
 import static io.github.guiritter.wavelet.Math.convolution;
 import static io.github.guiritter.wavelet.Math.downsample;
 import static io.github.guiritter.wavelet.Math.removeTrailingFiller;
+import static io.github.guiritter.wavelet.Math.softThreshold;
 import static io.github.guiritter.wavelet.Math.sum;
 import static io.github.guiritter.wavelet.Math.unbox;
 import static io.github.guiritter.wavelet.Math.upsample;
@@ -76,7 +77,7 @@ public final class Transform1D implements TransformData{
         }
         detailList.add(box(downsample(convolution(smooth, filterD))));
         smooth = downsample(convolution(smooth, filterC));
-        //*
+        /*
         System.out.println("smooth " + detailList.size());
         System.out.println(Arrays.toString(smooth));
         System.out.println("detail " + detailList.size());
@@ -85,7 +86,7 @@ public final class Transform1D implements TransformData{
         return true;
     }
 
-    public double[][] transformInverse(int J) {
+    public double[][] transformInverse(int J, Double softThreshold) {
         if (J > JMaximum) {
             throw new IllegalArgumentException("Requested level (" + J + ") is higher than maximum level (" + JMaximum + ").");
         }
@@ -100,10 +101,12 @@ public final class Transform1D implements TransformData{
             returnArray = new double[J + 1][];
         }
         if (J == detailList.size()) {
-            returnArray[0] = new double[smooth.length];
-            System.arraycopy(smooth, 0, returnArray[0], 0, smooth.length);
+            returnArray[0] = Arrays.copyOf(smooth, smooth.length);
             for (i = 1; i < returnArray.length; i++) {
                 returnArray[i] = unbox(detailList.get(detailList.size() - i));
+                if (softThreshold != null) {
+                    returnArray[i] = softThreshold(returnArray[i], softThreshold/* * pow(2, (returnArray.length - i) - 1)*/);
+                }
             }
         } else if (J < detailList.size()) {
             for (i = detailList.size() - 1; i >= J; i--) {
@@ -112,7 +115,11 @@ public final class Transform1D implements TransformData{
                 } else {
                     uSmooth = upsample(returnArray[0]);
                 }
-                uDetail = upsample(unbox(detailList.get(i)));
+                uDetail = unbox(detailList.get(i));
+                if (softThreshold != null) {
+                    uDetail = softThreshold(uDetail, softThreshold/* * pow(2, i - 1)*/);
+                }
+                uDetail = upsample(uDetail);
                 if (((i == 0) && (uSmooth.length > originalSize)) || ((i != 0) && (uSmooth.length > detailList.get(i - 1).length))) {
                     uSmooth = removeTrailingFiller(uSmooth);
                 }
@@ -126,11 +133,14 @@ public final class Transform1D implements TransformData{
                     wDetail = removeTrailingFiller(wDetail);
                 }
                 returnArray[0] = sum(wSmooth, wDetail);
-                System.out.println("reconstructed smooth " + i);
-                System.out.println(Arrays.toString(returnArray[0]));
+//                System.out.println("reconstructed smooth " + i);
+//                System.out.println(Arrays.toString(returnArray[0]));
             }
             for (i = 1; i < returnArray.length; i++) {
                 returnArray[i] = unbox(detailList.get(J - i));
+                if (softThreshold != null) {
+                    returnArray[i] = softThreshold(returnArray[i], softThreshold/* * pow(2, (returnArray.length - i) - 1)*/);
+                }
             }
         }
         return returnArray;
@@ -152,11 +162,11 @@ public final class Transform1D implements TransformData{
             j++;
         }
         JMaximum = j;
-             smooth = new double[original.length]; System.arraycopy(original, 0, smooth, 0, original.length);
-        this.filterC = new double[filterC.length]; System.arraycopy(filterC, 0, this.filterC, 0, filterC.length);
-        this.filterD = new double[filterD.length]; System.arraycopy(filterD, 0, this.filterD, 0, filterD.length);
-        this.filterF = new double[filterF.length]; System.arraycopy(filterF, 0, this.filterF, 0, filterF.length);
-        this.filterG = new double[filterG.length]; System.arraycopy(filterG, 0, this.filterG, 0, filterG.length);
+        smooth = Arrays.copyOf(original, original.length);
+        this.filterC = Arrays.copyOf(filterC, filterC.length);
+        this.filterD = Arrays.copyOf(filterD, filterD.length);
+        this.filterF = Arrays.copyOf(filterF, filterF.length);
+        this.filterG = Arrays.copyOf(filterG, filterG.length);
         for (i = 0; i < J; i++) {
             transformForward();
         }
@@ -191,7 +201,7 @@ public final class Transform1D implements TransformData{
          new double[]{ x,  x},
          new double[]{-x,  x},
          10);
-        double transformInverse[][] = transform1D.transformInverse(2);
+        double transformInverse[][] = transform1D.transformInverse(2, null);
         System.out.println(Arrays.deepToString(transformInverse));
         /**/
 //        transform1D.transformForward();

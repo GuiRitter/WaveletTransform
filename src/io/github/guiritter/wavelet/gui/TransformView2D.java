@@ -41,6 +41,7 @@ public final class TransformView2D implements TransformView{
     }
 
     public static final BufferedImage transform2DToImage(double componentArray[][][][][]) {
+//        double componentArray[][][][][] = matrixClone(input);
         normalize2DImage(componentArray);
         int width = componentArray[0][0][0][0].length;
         int height = componentArray[0][0][0].length;

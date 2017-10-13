@@ -11,12 +11,14 @@ import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -26,6 +28,7 @@ import javax.imageio.ImageIO;
  *
  * @author Guilherme Alan Ritter
  */
+@SuppressWarnings("LocalVariableHidesMemberVariable")
 public final class Main {
 
     private static int i;
@@ -75,6 +78,42 @@ public final class Main {
         return doubleMatrix;
     }
 
+    public static final double[][] matrixClone(double a[][]) {
+        int x;
+        int y;
+        double b[][] = new double[a.length][a[0].length];
+        for (y = 0; y < a.length; y++) {
+            for (x = 0; x < a[y].length; x++) {
+                b[y][x] = a[y][x];
+            }
+        }
+        return b;
+    }
+
+    public static final double[][][] matrixClone(double a[][][]) {
+        double b[][][] = new double[a.length][][];
+        for (int i = 0; i < a.length; i++) {
+            b[i] = matrixClone(a[i]);
+        }
+        return b;
+    }
+
+    public static final double[][][][] matrixClone(double a[][][][]) {
+        double b[][][][] = new double[a.length][][][];
+        for (int i = 0; i < a.length; i++) {
+            b[i] = matrixClone(a[i]);
+        }
+        return b;
+    }
+
+    public static final double[][][][][] matrixClone(double a[][][][][]) {
+        double b[][][][][] = new double[a.length][][][][];
+        for (int i = 0; i < a.length; i++) {
+            b[i] = matrixClone(a[i]);
+        }
+        return b;
+    }
+
     /**
      * Assumes the transform originated from an image: the original values
      * ranged from 0 to 255. The smooth coefficients must be divided by
@@ -120,7 +159,7 @@ public final class Main {
 
     public static void main(String args[]) throws IOException {
         double a = 1 / sqrt(2);
-        //*
+        /*
         double c[] = new double[]{ a,  a};
         double d[] = new double[]{-a,  a};
         double f[] = new double[]{ a,  a};
@@ -173,6 +212,37 @@ public final class Main {
         final MainFrame gui = new MainFrame() {
 
             @Override
+            public void onDataButtonPressed() {
+                File file = fileOpen();
+                if (file == null) {
+                    return;
+                }
+                double c[] = decode1D(getFilterC());
+                double d[] = decode1D(getFilterD());
+                double f[] = decode1D(getFilterF());
+                double g[] = decode1D(getFilterG());
+                int J = getLevel();
+                try {
+                    BufferedReader reader = Files.newBufferedReader(file.toPath());
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (line.trim().isEmpty()) {
+                            continue;
+                        }
+                        // I had an idea to create transformations
+                        // from the result of the transformation,
+                        // but I couldn't solve the original size problem yet
+                        if (line.contains("A")) {
+                            continue;
+                        }
+                        set.add(new Transform(file.getName(), new TransformData[]{new Transform1D(decode1D(line), c, d, f, g, J)}, J));
+                    }
+                } catch (IOException ex) {
+                    showError(frame, ex.getLocalizedMessage(), ex);
+                }
+            }
+
+            @Override
             public void onImageButtonPressed() {
                 File file = fileOpen();
                 if (file == null) {
@@ -182,7 +252,7 @@ public final class Main {
                 double d[] = decode1D(getFilterD());
                 double f[] = decode1D(getFilterF());
                 double g[] = decode1D(getFilterG());
-                int level = getLevel();
+                int J = getLevel();
                 BufferedImage image;
                 try {
                     image = ImageIO.read(file);
@@ -190,12 +260,18 @@ public final class Main {
                     showError(frame, ex.getLocalizedMessage(), ex);
                     return;
                 }
-                int componentAmount = image.getRaster().getPixel(0, 0, (int[]) null).length;
+                int componentAmount;
+                try {
+                    componentAmount = image.getRaster().getPixel(0, 0, (int[]) null).length;
+                } catch (Exception ex) {
+                    showError(frame, ex.getLocalizedMessage(), ex);
+                    return;
+                }
                 TransformData transformArray[] = new TransformData[componentAmount];
                 for (int i = 0; i < componentAmount; i++) {
-                    transformArray[i] = new Transform2D(imageToMatrix(image, i), c, d, f, g, level);
+                    transformArray[i] = new Transform2D(imageToMatrix(image, i), c, d, f, g, J);
                 }
-                set.add(new Transform(file.getName(), transformArray, level));
+                set.add(new Transform(file.getName(), transformArray, J));
             }
         };
     }

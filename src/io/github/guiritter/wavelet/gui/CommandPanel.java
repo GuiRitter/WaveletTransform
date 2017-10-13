@@ -24,6 +24,16 @@ public abstract class CommandPanel {
 
     final JPanel panel;
 
+    private final JTextField softThresholdField;
+
+    public int getLevel() {
+        return (int) levelSpinner.getModel().getValue();
+    }
+
+    public String getSoftThreshold() {
+        return softThresholdField.getText();
+    }
+
     public final void levelIncrease() {
         ((SpinnerNumberModel) levelSpinner.getModel()).setMaximum(((int) ((SpinnerNumberModel) levelSpinner.getModel()).getMaximum()) + 1);
         levelSpinner.setValue(((SpinnerNumberModel) levelSpinner.getModel()).getMaximum());
@@ -36,6 +46,8 @@ public abstract class CommandPanel {
     public abstract void onIncreaseButtonPressed();
 
     public abstract void onLevelChanged(int level);
+
+    public abstract void onRefreshButtonPressed();
 
     public CommandPanel(int level) {
         panel = new JPanel();
@@ -52,7 +64,7 @@ public abstract class CommandPanel {
                     return;
                 }
             }
-            onLevelChanged((int) levelSpinner.getModel().getValue());
+            onLevelChanged(getLevel());
         });
         panel.add(levelSpinner);
 
@@ -70,12 +82,16 @@ public abstract class CommandPanel {
         label = new JLabel("threshold: ");
         panel.add(label);
 
-        JTextField field = new JTextField();
-        panel.add(field);
+        softThresholdField = new JTextField();
+        panel.add(softThresholdField);
 
         panel.add(Box.createRigidArea(SPACE_DIMENSION));
 
         button = new JButton("refresh");
+        button.addActionListener((ActionEvent e) -> {
+
+            onRefreshButtonPressed();
+        });
         panel.add(button);
 
         panel.add(Box.createRigidArea(SPACE_DIMENSION));
@@ -120,6 +136,11 @@ public abstract class CommandPanel {
 
             @Override
             public void onLevelChanged(int level) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void onRefreshButtonPressed() {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         }).panel);

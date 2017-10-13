@@ -4,15 +4,18 @@ import static io.github.guiritter.wavelet.Detail2D.CD;
 import static io.github.guiritter.wavelet.Detail2D.DC;
 import static io.github.guiritter.wavelet.Detail2D.DD;
 import static io.github.guiritter.wavelet.Main.imageToMatrix;
+import static io.github.guiritter.wavelet.Main.matrixClone;
 import static io.github.guiritter.wavelet.Math.convolutionX;
 import static io.github.guiritter.wavelet.Math.convolutionY;
 import static io.github.guiritter.wavelet.Math.downsample;
 import static io.github.guiritter.wavelet.Math.removeTrailingFiller;
+import static io.github.guiritter.wavelet.Math.softThreshold;
 import static io.github.guiritter.wavelet.Math.sum;
 import static io.github.guiritter.wavelet.Math.upsample;
 import java.io.File;
 import java.io.IOException;
 import static java.lang.Math.sqrt;
+import java.util.Arrays;
 import java.util.LinkedList;
 import javax.imageio.ImageIO;
 
@@ -101,18 +104,6 @@ public final class Transform2D implements TransformData{
         return JMaximum;
     }
 
-    public static final double[][] matrixClone(double a[][]) {
-        int x;
-        int y;
-        double b[][] = new double[a.length][a[0].length];
-        for (y = 0; y < a.length; y++) {
-            for (x = 0; x < a[y].length; x++) {
-                b[y][x] = a[y][x];
-            }
-        }
-        return b;
-    }
-
     @Override
     public boolean transformForward() {
         if (detailList.size() >= JMaximum) {
@@ -138,7 +129,7 @@ public final class Transform2D implements TransformData{
         return true;
     }
 
-    public double[][][][] transformInverse(int J) {
+    public double[][][][] transformInverse(int J, Double softThreshold) {
         if (J > JMaximum) {
             throw new IllegalArgumentException("Required level (" + J + ") is higher than maximum level (" + JMaximum + ").");
         }
@@ -160,6 +151,11 @@ public final class Transform2D implements TransformData{
                 returnArray[i][CD] = matrixClone(detailList.get(detailList.size() - i).cd);
                 returnArray[i][DC] = matrixClone(detailList.get(detailList.size() - i).dc);
                 returnArray[i][DD] = matrixClone(detailList.get(detailList.size() - i).dd);
+                if (softThreshold != null) {
+                    returnArray[i][CD] = softThreshold(returnArray[i][CD], softThreshold/* * pow(2, (returnArray.length - i) - 1)*/);
+                    returnArray[i][DC] = softThreshold(returnArray[i][DC], softThreshold/* * pow(2, (returnArray.length - i) - 1)*/);
+                    returnArray[i][DD] = softThreshold(returnArray[i][DD], softThreshold/* * pow(2, (returnArray.length - i) - 1)*/);
+                }
             }
         } else if (J < detailList.size()) {
             for (i = detailList.size() - 1; i >= J; i--) {
@@ -175,9 +171,17 @@ public final class Transform2D implements TransformData{
                 } else {
                     uSmooth = upsample(returnArray[0][0]);
                 }
-                uDetailCD = upsample(detailList.get(i).cd);
-                uDetailDC = upsample(detailList.get(i).dc);
-                uDetailDD = upsample(detailList.get(i).dd);
+                uDetailCD = detailList.get(i).cd;
+                uDetailDC = detailList.get(i).dc;
+                uDetailDD = detailList.get(i).dd;
+                if (softThreshold != null) {
+                    uDetailCD = softThreshold(uDetailCD, softThreshold/* * pow(2, i - 1)*/);
+                    uDetailDC = softThreshold(uDetailDC, softThreshold/* * pow(2, i - 1)*/);
+                    uDetailDD = softThreshold(uDetailDD, softThreshold/* * pow(2, i - 1)*/);
+                }
+                uDetailCD = upsample(uDetailCD);
+                uDetailDC = upsample(uDetailDC);
+                uDetailDD = upsample(uDetailDD);
                 uSmooth   = removeTrailingFiller(uSmooth  , maximumSizeX, maximumSizeY);
                 uDetailCD = removeTrailingFiller(uDetailCD, maximumSizeX, maximumSizeY);
                 uDetailDC = removeTrailingFiller(uDetailDC, maximumSizeX, maximumSizeY);
@@ -197,7 +201,19 @@ public final class Transform2D implements TransformData{
                 }
             }
             for (i = 1; i < returnArray.length; i++) {
-                returnArray[i] = new double[][][]{detailList.get(J - i).cd, detailList.get(J - i).dc, detailList.get(J - i).dd};
+                wDetailCD = detailList.get(J - i).cd;
+                wDetailDC = detailList.get(J - i).dc;
+                wDetailDD = detailList.get(J - i).dd;
+                if (softThreshold != null) {
+                    wDetailCD = softThreshold(wDetailCD, softThreshold/* * pow(2, (returnArray.length - i) - 1)*/);
+                    wDetailDC = softThreshold(wDetailDC, softThreshold/* * pow(2, (returnArray.length - i) - 1)*/);
+                    wDetailDD = softThreshold(wDetailDD, softThreshold/* * pow(2, (returnArray.length - i) - 1)*/);
+                }
+                returnArray[i] = new double[][][]{
+                    wDetailCD,
+                    wDetailDC,
+                    wDetailDD
+                };
             }
         }
         return returnArray;
@@ -224,14 +240,25 @@ public final class Transform2D implements TransformData{
         }
         JMaximum = i;
         smooth = matrixClone(original);
-        this.filterC = new double[filterC.length]; System.arraycopy(filterC, 0, this.filterC, 0, filterC.length);
-        this.filterD = new double[filterD.length]; System.arraycopy(filterD, 0, this.filterD, 0, filterD.length);
-        this.filterF = new double[filterF.length]; System.arraycopy(filterF, 0, this.filterF, 0, filterF.length);
-        this.filterG = new double[filterG.length]; System.arraycopy(filterG, 0, this.filterG, 0, filterG.length);
+        this.filterC = Arrays.copyOf(filterC, filterC.length);
+        this.filterD = Arrays.copyOf(filterD, filterD.length);
+        this.filterF = Arrays.copyOf(filterF, filterF.length);
+        this.filterG = Arrays.copyOf(filterG, filterG.length);
         for (i = 0; i < J; i++) {
             transformForward();
         }
     }
+
+//    /**;
+//     * development put on hold because how will I know the original size of the image if it comes already transformed?
+//     * @param transform
+//     * @param filterC
+//     * @param filterD
+//     * @param filterF
+//     * @param filterG
+//     */
+//    public Transform2D(double transform[][][][], double filterC[], double filterD[], double filterF[], double filterG[]) {
+//    }
 
     public static void main(String args[]) throws IOException {
         double x = 1 / sqrt(2);

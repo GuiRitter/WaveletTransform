@@ -26,6 +26,8 @@ public abstract class TransformFrame {
 
     private final CommandPanel command;
 
+    private final String ERROR_INSTANCE = "Object doesn't represent a valid 1D or 2D transform.";
+
     private final TransformView view;
 
     private void constructorPostamble(int level) {
@@ -64,31 +66,20 @@ public abstract class TransformFrame {
         return view.getImage();
     }
 
+    public int getLevel() {
+        return command.getLevel();
+    }
+
+    public final String getSoftThreshold() {
+        return command.getSoftThreshold();
+    }
+
     public final void levelIncrease() {
         command.levelIncrease();
     }
 
-    public abstract void onDataButtonPressed(int level);
-
-    public abstract void onImageButtonPressed();
-
-    public abstract void onIncreaseButtonPressed();
-
-    public abstract void onLevelChanged(int level);
-
-    public void setView(double componentArray[][][][][]) {
-        view.setView(componentArray);
-    }
-
-    public TransformFrame(String name, double componentArray[][][][][]) {
-        chooser = new JFileChooser();
-        chooser.setFileSelectionMode(FILES_ONLY);
-        frame = new JFrame(name);
-        view = new TransformView2D(componentArray);
-
-        int level = componentArray[0].length - 1;
-
-        command = new CommandPanel(level) {
+    private CommandPanel newCommandPanel(int level) {
+        return new CommandPanel(level) {
 
             @Override
             public void onDataButtonPressed(int level) {
@@ -109,8 +100,54 @@ public abstract class TransformFrame {
             public void onLevelChanged(int level) {
                 TransformFrame.this.onLevelChanged(level);
             }
-        };
 
+            @Override
+            public void onRefreshButtonPressed() {
+                TransformFrame.this.onRefreshButtonPressed();
+            }
+        };
+    }
+
+    public abstract void onDataButtonPressed(int level);
+
+    public abstract void onImageButtonPressed();
+
+    public abstract void onIncreaseButtonPressed();
+
+    public abstract void onLevelChanged(int level);
+
+    public abstract void onRefreshButtonPressed();
+
+    public void setView(Object matrix) {
+        if (matrix instanceof double[][]) {
+            view.setView((double[][]) matrix);
+
+        } else if (matrix instanceof double[][][][][]) {
+            view.setView((double[][][][][]) matrix);
+
+        } else {
+            throw new IllegalArgumentException(ERROR_INSTANCE);
+        }
+    }
+
+    public TransformFrame(String name, Object doubleMatrix) {
+        chooser = new JFileChooser();
+        chooser.setFileSelectionMode(FILES_ONLY);
+        frame = new JFrame(name);
+        int level;
+
+        if (doubleMatrix instanceof double[][]) {
+            view = new TransformView1D((double[][]) doubleMatrix);
+            level = ((double[][]) doubleMatrix).length - 1;
+
+        } else if (doubleMatrix instanceof double[][][][][]) {
+            view = new TransformView2D((double[][][][][]) doubleMatrix);
+            level = ((double[][][][][]) doubleMatrix)[0].length - 1;
+
+        } else {
+            throw new IllegalArgumentException(ERROR_INSTANCE);
+        }
+        command = newCommandPanel(level);
         constructorPostamble(level);
     }
 }
