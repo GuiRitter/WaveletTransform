@@ -22,6 +22,7 @@ import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -74,12 +75,12 @@ public abstract class MainFrame {
         }
     }
 
-    public final File fileOpen() {
-        chooser.setSelectedFile(null);
+    public final File[] fileOpen() {
+        chooser.setSelectedFiles(null);
         if (chooser.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION) {
             return null;
         }
-        return chooser.getSelectedFile();
+        return chooser.getSelectedFiles();
     }
 
     public final String getFilterC() {
@@ -102,16 +103,25 @@ public abstract class MainFrame {
         return (int) levelSpinner.getModel().getValue();
     }
 
-    public static final void showError(Component parent, String message, Exception ex) {
+    public static final void showDialog(Component parent, String message, Exception ex, int messageType) {
         if (ex != null) {
             ex.printStackTrace();
         }
-        JOptionPane.showMessageDialog(parent, message, "Error", ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(parent, message, "Error", messageType);
+    }
+
+    public static final void showError(Component parent, String message, Exception ex) {
+        showDialog(parent, message, ex, ERROR_MESSAGE);
+    }
+
+    public static final void showWarning(Component parent, String message, Exception ex) {
+        showDialog(parent, message, ex, WARNING_MESSAGE);
     }
 
     public MainFrame() {
         chooser = new JFileChooser();
         chooser.setFileSelectionMode(FILES_ONLY);
+        chooser.setMultiSelectionEnabled(true);
 
         frame = new JFrame("Wavelet Transform");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);

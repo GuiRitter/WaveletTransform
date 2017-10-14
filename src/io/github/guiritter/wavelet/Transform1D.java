@@ -1,5 +1,6 @@
 package io.github.guiritter.wavelet;
 
+import static io.github.guiritter.wavelet.Main.getJMaximumWarning;
 import static io.github.guiritter.wavelet.Math.box;
 import static io.github.guiritter.wavelet.Math.convolution;
 import static io.github.guiritter.wavelet.Math.downsample;
@@ -88,7 +89,7 @@ public final class Transform1D implements TransformData{
 
     public double[][] transformInverse(int J, Double softThreshold) {
         if (J > JMaximum) {
-            throw new IllegalArgumentException("Requested level (" + J + ") is higher than maximum level (" + JMaximum + ").");
+            throw new IllegalArgumentException(getJMaximumWarning(J, JMaximum));
         }
         if (J < 0) {
             returnArray = null;

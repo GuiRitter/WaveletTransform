@@ -1,6 +1,7 @@
 package io.github.guiritter.wavelet;
 
 import static io.github.guiritter.wavelet.DoubleMatrixParser.decode1D;
+import static io.github.guiritter.wavelet.DoubleMatrixParser.decode3D;
 import io.github.guiritter.wavelet.gui.MainFrame;
 import java.awt.Point;
 import java.awt.Transparency;
@@ -25,7 +26,6 @@ import java.util.WeakHashMap;
 import javax.imageio.ImageIO;
 
 /**
- *
  * @author Guilherme Alan Ritter
  */
 @SuppressWarnings("LocalVariableHidesMemberVariable")
@@ -61,6 +61,10 @@ public final class Main {
 
         // Create a custom BufferedImage with the raster and a suitable color model
         return new BufferedImage(new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_GRAY), true, false, Transparency.TRANSLUCENT, DataBuffer.TYPE_BYTE), raster, false, null);
+    }
+
+    static String getJMaximumWarning(int current, int maximum) {
+        return "Requested level (" + current + ") is higher than maximum level (" + maximum + ").";
     }
 
     public static final double[][] imageToMatrix(BufferedImage image, int componentIndex) {
@@ -213,8 +217,8 @@ public final class Main {
 
             @Override
             public void onDataButtonPressed() {
-                File file = fileOpen();
-                if (file == null) {
+                File fileArray[] = fileOpen();
+                if (fileArray == null) {
                     return;
                 }
                 double c[] = decode1D(getFilterC());
@@ -222,30 +226,47 @@ public final class Main {
                 double f[] = decode1D(getFilterF());
                 double g[] = decode1D(getFilterG());
                 int J = getLevel();
-                try {
-                    BufferedReader reader = Files.newBufferedReader(file.toPath());
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        if (line.trim().isEmpty()) {
-                            continue;
+                for (File file : fileArray) {
+                    try {
+                        BufferedReader reader = Files.newBufferedReader(file.toPath());
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            if (line.trim().isEmpty()) {
+                                continue;
+                            }
+                            // I had an idea to create transformations
+                            // from the result of the transformation,
+                            // but I couldn't solve the original size problem yet
+                            TransformData transformArray[];
+                            if (line.contains("A")) {
+                                double doubleMatrix[][][] = decode3D(line);
+                                transformArray = new TransformData[doubleMatrix.length];
+                                for (int i = 0; i < doubleMatrix.length; i++) {
+                                    transformArray[i] = new Transform2D(doubleMatrix[i], c, d, f, g, J);
+                                }
+                                if (J > transformArray[0].getJMaximum()) {
+                                    showWarning(frame, getJMaximumWarning(J, transformArray[0].getJMaximum()) + "\nDefaulting to maximum allowed.", null);
+                                    J = transformArray[0].getJMaximum();
+                                }
+                            } else {
+                                transformArray = new TransformData[]{new Transform1D(decode1D(line), c, d, f, g, J)};
+                                if (J > transformArray[0].getJMaximum()) {
+                                    showWarning(frame, getJMaximumWarning(J, transformArray[0].getJMaximum()) + "\nDefaulting to maximum allowed.", null);
+                                    J = transformArray[0].getJMaximum();
+                                }
+                            }
+                            set.add(new Transform(file.getName(), transformArray, J));
                         }
-                        // I had an idea to create transformations
-                        // from the result of the transformation,
-                        // but I couldn't solve the original size problem yet
-                        if (line.contains("A")) {
-                            continue;
-                        }
-                        set.add(new Transform(file.getName(), new TransformData[]{new Transform1D(decode1D(line), c, d, f, g, J)}, J));
+                    } catch (IOException ex) {
+                        showError(frame, ex.getLocalizedMessage(), ex);
                     }
-                } catch (IOException ex) {
-                    showError(frame, ex.getLocalizedMessage(), ex);
                 }
             }
 
             @Override
             public void onImageButtonPressed() {
-                File file = fileOpen();
-                if (file == null) {
+                File fileArray[] = fileOpen();
+                if (fileArray == null) {
                     return;
                 }
                 double c[] = decode1D(getFilterC());
@@ -253,25 +274,31 @@ public final class Main {
                 double f[] = decode1D(getFilterF());
                 double g[] = decode1D(getFilterG());
                 int J = getLevel();
-                BufferedImage image;
-                try {
-                    image = ImageIO.read(file);
-                } catch (IOException ex) {
-                    showError(frame, ex.getLocalizedMessage(), ex);
-                    return;
+                for (File file : fileArray) {
+                    BufferedImage image;
+                    try {
+                        image = ImageIO.read(file);
+                    } catch (IOException ex) {
+                        showError(frame, ex.getLocalizedMessage(), ex);
+                        return;
+                    }
+                    int componentAmount;
+                    try {
+                        componentAmount = image.getRaster().getPixel(0, 0, (int[]) null).length;
+                    } catch (Exception ex) {
+                        showError(frame, ex.getLocalizedMessage(), ex);
+                        return;
+                    }
+                    TransformData transformArray[] = new TransformData[componentAmount];
+                    for (int i = 0; i < componentAmount; i++) {
+                        transformArray[i] = new Transform2D(imageToMatrix(image, i), c, d, f, g, J);
+                    }
+                    if (J > transformArray[0].getJMaximum()) {
+                        showWarning(frame, getJMaximumWarning(J, transformArray[0].getJMaximum()) + "\nDefaulting to maximum allowed.", null);
+                        J = transformArray[0].getJMaximum();
+                    }
+                    set.add(new Transform(file.getName(), transformArray, J));
                 }
-                int componentAmount;
-                try {
-                    componentAmount = image.getRaster().getPixel(0, 0, (int[]) null).length;
-                } catch (Exception ex) {
-                    showError(frame, ex.getLocalizedMessage(), ex);
-                    return;
-                }
-                TransformData transformArray[] = new TransformData[componentAmount];
-                for (int i = 0; i < componentAmount; i++) {
-                    transformArray[i] = new Transform2D(imageToMatrix(image, i), c, d, f, g, J);
-                }
-                set.add(new Transform(file.getName(), transformArray, J));
             }
         };
     }

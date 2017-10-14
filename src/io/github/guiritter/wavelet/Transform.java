@@ -1,7 +1,9 @@
 package io.github.guiritter.wavelet;
 
 import static io.github.guiritter.wavelet.DoubleMatrixParser.encode;
+import static io.github.guiritter.wavelet.Main.getJMaximumWarning;
 import static io.github.guiritter.wavelet.gui.MainFrame.showError;
+import static io.github.guiritter.wavelet.gui.MainFrame.showWarning;
 import io.github.guiritter.wavelet.gui.TransformFrame;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
@@ -86,7 +88,11 @@ public final class Transform {
 
             @Override
             public void onIncreaseButtonPressed() {
-                levelIncrease();
+                if (data[0].getJ() == data[0].getJMaximum()) {
+                    showWarning(frame, getJMaximumWarning(data[0].getJ() + data[0].getJMaximum(), 0), null);
+                } else {
+                    levelIncrease();
+                }
             }
 
             @Override
