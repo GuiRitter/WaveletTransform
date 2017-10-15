@@ -22,6 +22,11 @@ The "Data" button loads a text file. Each line generates a transform.
 A line with real values separated by space characters generates a 1D transform.
 A line with two of the above defined value array separated by the character "A" generates a 2D transform. Additionally, up to four of these, separated by the character "B", represent different color channels.
 
+* 1 component: black and white image.
+* 2 components: black and white image with transparency.
+* 3 component: color image.
+* 4 components: color image with transparency.
+
 The "Image" button loads an image and generates a 2D transform.
 The "Filter" combo box loads predefined filter parameters.
 The "Level" spinner sets the initial transform level.
