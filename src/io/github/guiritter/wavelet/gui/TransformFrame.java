@@ -139,6 +139,10 @@ public abstract class TransformFrame {
         if (doubleMatrix instanceof double[][]) {
             view = new TransformView1D((double[][]) doubleMatrix);
             level = ((double[][]) doubleMatrix).length - 1;
+            /* TODO test custom constructor
+            level = 1;
+            view = new TransformView1D((double[][]) doubleMatrix, null);
+            /**/
 
         } else if (doubleMatrix instanceof double[][][][][]) {
             view = new TransformView2D((double[][][][][]) doubleMatrix);

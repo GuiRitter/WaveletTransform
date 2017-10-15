@@ -53,7 +53,7 @@ public abstract class CommandPanel {
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, LINE_AXIS));
 
-        JLabel label = new JLabel("level: ");
+        JLabel label = new JLabel("Level: ");
         panel.add(label);
 
         levelSpinner = new JSpinner(new SpinnerNumberModel(level, 0, level, 1));
@@ -70,7 +70,7 @@ public abstract class CommandPanel {
 
         panel.add(Box.createRigidArea(SPACE_DIMENSION));
 
-        JButton button = new JButton("increase");
+        JButton button = new JButton("Increase");
         button.addActionListener((ActionEvent e) -> {
 
             onIncreaseButtonPressed();
@@ -79,7 +79,7 @@ public abstract class CommandPanel {
 
         panel.add(Box.createRigidArea(SPACE_DIMENSION));
 
-        label = new JLabel("threshold: ");
+        label = new JLabel("Threshold: ");
         panel.add(label);
 
         softThresholdField = new JTextField();
@@ -87,7 +87,7 @@ public abstract class CommandPanel {
 
         panel.add(Box.createRigidArea(SPACE_DIMENSION));
 
-        button = new JButton("refresh");
+        button = new JButton("Refresh");
         button.addActionListener((ActionEvent e) -> {
 
             onRefreshButtonPressed();
@@ -96,7 +96,7 @@ public abstract class CommandPanel {
 
         panel.add(Box.createRigidArea(SPACE_DIMENSION));
 
-        button = new JButton("data");
+        button = new JButton("Data");
         button.addActionListener((ActionEvent e) -> {
 
             onDataButtonPressed((int) levelSpinner.getModel().getValue());
@@ -105,7 +105,7 @@ public abstract class CommandPanel {
 
         panel.add(Box.createRigidArea(SPACE_DIMENSION));
 
-        button = new JButton("image");
+        button = new JButton("Image");
         button.addActionListener((ActionEvent e) -> {
 
             onImageButtonPressed();

@@ -29,6 +29,21 @@ public final class Transform {
 
     public final double[][] getInverseView1D(int J, Double softThreshold) {
         return ((Transform1D) data[0]).transformInverse(J, softThreshold);
+        /* TODO test array with different soft threshold values
+        double returnArray[][] = new double[11][];
+        returnArray[ 0] = ((Transform1D) data[0]).transformInverse(0, 0.0d)[0];
+        returnArray[ 1] = ((Transform1D) data[0]).transformInverse(0, 0.1d)[0];
+        returnArray[ 2] = ((Transform1D) data[0]).transformInverse(0, 0.2d)[0];
+        returnArray[ 3] = ((Transform1D) data[0]).transformInverse(0, 0.3d)[0];
+        returnArray[ 4] = ((Transform1D) data[0]).transformInverse(0, 0.4d)[0];
+        returnArray[ 5] = ((Transform1D) data[0]).transformInverse(0, 0.5d)[0];
+        returnArray[ 6] = ((Transform1D) data[0]).transformInverse(0, 0.6d)[0];
+        returnArray[ 7] = ((Transform1D) data[0]).transformInverse(0, 0.7d)[0];
+        returnArray[ 8] = ((Transform1D) data[0]).transformInverse(0, 0.8d)[0];
+        returnArray[ 9] = ((Transform1D) data[0]).transformInverse(0, 0.9d)[0];
+        returnArray[10] = ((Transform1D) data[0]).transformInverse(0, 1.00d)[0];
+        return returnArray;
+        /**/
     }
 
     public final double[][][][][] getInverseView2D(int J, Double softThreshold) {

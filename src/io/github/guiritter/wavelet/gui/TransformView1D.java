@@ -35,7 +35,7 @@ public final class TransformView1D implements TransformView{
     }
 
     @Override
-    public void setView(double[][] signalArray) {
+    public void setView(double signalArray[][]) {
         panel.removeAll();
         XYSeries series;
         XYSeriesCollection collection;
@@ -61,8 +61,35 @@ public final class TransformView1D implements TransformView{
         panel.repaint();
     }
 
+    /**
+     * TODO test show different soft threshold values
+     * @param signalArray
+     */
+    public void setViewTest0(double signalArray[][]) {
+        panel.removeAll();
+        XYSeries series;
+        XYSeriesCollection collection = new XYSeriesCollection();
+        JFreeChart chart;
+        ChartPanel chartPanel;
+        int j;
+        for (int i = 0; i < signalArray.length; i++) {
+            series = new XYSeries("t = " + (i / 10.0));
+            for (j = 0; j < signalArray[i].length; j++) {
+                series.add(j, signalArray[i][j]);
+            }
+            collection.addSeries(series);
+        }
+        chart = ChartFactory.createXYLineChart("Smooth J = 1", "samples", "value", collection, VERTICAL, true, false, false);
+        chartPanel = new ChartPanel(chart);
+        chartPanel.setFillZoomRectangle(true);
+        chartPanel.setMouseWheelEnabled(true);
+        panel.add(chartPanel);
+        panel.revalidate();
+        panel.repaint();
+    }
+
     @Override
-    public void setView(double[][][][][] componentArray) {
+    public void setView(double componentArray[][][][][]) {
         throw new UnsupportedOperationException("Not supported for this version.");
     }
 
@@ -70,6 +97,12 @@ public final class TransformView1D implements TransformView{
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, PAGE_AXIS));
         setView(signalArray);
+    }
+
+    public TransformView1D(double signalArray[][], Boolean test0) {
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, PAGE_AXIS));
+        setViewTest0(signalArray);
     }
 
     public static void main(String args[]) throws IOException, InterruptedException {
