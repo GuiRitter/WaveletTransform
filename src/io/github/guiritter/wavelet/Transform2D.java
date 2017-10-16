@@ -194,11 +194,7 @@ public final class Transform2D implements TransformData{
                 temporaryD = sum(wDetailDC, wDetailDD);
                 temporaryC = convolutionY(temporaryC, filterF);
                 temporaryD = convolutionY(temporaryD, filterG);
-                /**/try {
                 returnArray[0][0] = removeTrailingFiller(sum(temporaryC, temporaryD), maximumSizeX, maximumSizeY);
-                /**/} catch (Exception ex) {
-                    System.out.println("ex");
-                }
             }
             for (i = 1; i < returnArray.length; i++) {
                 wDetailCD = matrixClone(detailList.get(J - i).cd);
