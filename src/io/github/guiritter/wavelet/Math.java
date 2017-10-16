@@ -212,17 +212,19 @@ public final class Math {
     }
 
     public static double[] softThreshold(double input[], double threshold) {
+        double output[] = new double[input.length];
         for (int i = 0; i < input.length; i++) {
-            input[i] = softThreshold(input[i], threshold);
+            output[i] = softThreshold(input[i], threshold);
         }
-        return input;
+        return output;
     }
 
     public static double[][] softThreshold(double input[][], double threshold) {
+        double output[][] = new double[input.length][];
         for (int y = 0; y < input.length; y++) {
-            input[y] = softThreshold(input[y], threshold);
+            output[y] = softThreshold(input[y], threshold);
         }
-        return input;
+        return output;
     }
 
     public static double[] sum(double a[], double b[]) {

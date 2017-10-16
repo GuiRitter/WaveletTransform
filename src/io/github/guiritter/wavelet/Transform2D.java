@@ -201,9 +201,9 @@ public final class Transform2D implements TransformData{
                 }
             }
             for (i = 1; i < returnArray.length; i++) {
-                wDetailCD = detailList.get(J - i).cd;
-                wDetailDC = detailList.get(J - i).dc;
-                wDetailDD = detailList.get(J - i).dd;
+                wDetailCD = matrixClone(detailList.get(J - i).cd);
+                wDetailDC = matrixClone(detailList.get(J - i).dc);
+                wDetailDD = matrixClone(detailList.get(J - i).dd);
                 if (softThreshold != null) {
                     wDetailCD = softThreshold(wDetailCD, softThreshold/* * pow(2, (returnArray.length - i) - 1)*/);
                     wDetailDC = softThreshold(wDetailDC, softThreshold/* * pow(2, (returnArray.length - i) - 1)*/);
