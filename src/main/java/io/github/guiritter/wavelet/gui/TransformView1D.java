@@ -63,7 +63,7 @@ public final class TransformView1D implements TransformView{
 
     /**
      * TODO test show different soft threshold values
-     * @param signalArray
+     * @param signalArray original signal and its details to be rendered in charts
      */
     public void setViewTest0(double signalArray[][]) {
         panel.removeAll();

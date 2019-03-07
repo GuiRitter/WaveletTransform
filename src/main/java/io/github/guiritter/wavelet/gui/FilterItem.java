@@ -29,7 +29,7 @@ public final class FilterItem {
     }
 
     static {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(FilterItem.class.getResourceAsStream("filter list.txt")));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(FilterItem.class.getClassLoader().getResourceAsStream("filter list.txt")));
         int stateI = 0;
         final int STATE_NAME = stateI++;
         final int STATE_C = stateI++;

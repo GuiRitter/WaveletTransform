@@ -1,0 +1,37 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 16.04.2 ] */
+
+/* [wxMaxima: input   start ] */
+l:random(9) + 1;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+a:makelist(0,i,1,l);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+a[1] : 2$
+for i : 2 thru 3 do a[i]:next_prime(a[i - 1]);
+a;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+l:random(9) + 1;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+b:makelist(0,i,1,l);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+b[1] : 97$
+for i : 2 thru l do b[i]:prev_prime(b[i - 1]);
+b:b/100;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+N+M-1-N
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

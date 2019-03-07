@@ -31,7 +31,6 @@ import javax.swing.SpinnerNumberModel;
  *
  * @author Guilherme Alan Ritter
  */
-@SuppressWarnings("CallToPrintStackTrace")
 public abstract class MainFrame {
 
     private final JTextField cField;

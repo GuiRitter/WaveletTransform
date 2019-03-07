@@ -2,7 +2,10 @@ package io.github.guiritter.wavelet;
 
 import static io.github.guiritter.wavelet.DoubleMatrixParser.decode1D;
 import static io.github.guiritter.wavelet.DoubleMatrixParser.decode3D;
-import io.github.guiritter.wavelet.gui.MainFrame;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.lang.Math.pow;
+
 import java.awt.Point;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -15,20 +18,18 @@ import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.lang.Math.pow;
-import static java.lang.Math.sqrt;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
+
 import javax.imageio.ImageIO;
+
+import io.github.guiritter.wavelet.gui.MainFrame;
 
 /**
  * @author Guilherme Alan Ritter
  */
-@SuppressWarnings("LocalVariableHidesMemberVariable")
 public final class Main {
 
     private static int i;
@@ -44,10 +45,11 @@ public final class Main {
     private static int y;
 
     /**
-     * https://stackoverflow.com/questions/21176754/how-can-i-convert-an-image-to-grayscale-without-losing-transparency
-     * @param width
-     * @param height
-     * @return
+     * <p>In order to be able to read a matrix of pairs of values and build a {@link java.awt.image.BufferedImage BufferedImage} that occupies exactly 2 bytes for every pixel, this method is necessary.
+     * <p><a href="https://stackoverflow.com/questions/21176754/how-can-i-convert-an-image-to-grayscale-without-losing-transparency">Source</a>.
+     * @param width matrix width
+     * @param height matrix height
+     * @return an image where every pixel is represented by gray level and alpha, hence, 2 bytes
      */
     public static BufferedImage create2ByteGrayAlphaImage(int width, int height) {
         int[] bandOffsets = new int[]{1, 0}; // gray + alpha
@@ -123,7 +125,7 @@ public final class Main {
      * ranged from 0 to 255. The smooth coefficients must be divided by
      * 2 * J and the detail coefficients must be summed by 2 * J * 255 and
      * divided by 4 * J.
-     * @param componentArray
+     * @param componentArray values that need to be normalized so the math works correctly
      */
     public static final void normalize2DImage(double componentArray[][][][][]) {
         int J = componentArray[0].length - 1;
@@ -162,7 +164,7 @@ public final class Main {
     }
 
     public static void main(String args[]) throws IOException {
-        double a = 1 / sqrt(2);
+        // double a = 1 / sqrt(2);
         /*
         double c[] = new double[]{ a,  a};
         double d[] = new double[]{-a,  a};
@@ -187,11 +189,11 @@ public final class Main {
         double f[] = new double[]{-0.0727,  0.3379,  0.8526,  0.3849, -0.0727, -0.0157};
         double g[] = new double[]{-0.0157,  0.0727,  0.3849, -0.8526,  0.3379,  0.0727};
         /**/
-        int b = 6;
-        String s = "C:/users/guir/documents/Lenna.png";
-//        String s = "C:/users/guir/documents/test downsampling without smoothing.png";
-//        String s = "/home/guir/Imagens/thumb-1920-262599.jpg";
-        int e = 0;
+        // int b = 6;
+        // String s = "C:/users/guir/documents/Lenna.png";
+        // String s = "C:/users/guir/documents/test downsampling without smoothing.png";
+        // String s = "/home/guir/Imagens/thumb-1920-262599.jpg";
+        // int e = 0;
         /*
         Transform2D transform2D = new Transform2D(
          imageToMatrix(ImageIO.read(new File(s)), 0),
@@ -213,7 +215,7 @@ public final class Main {
 //        componentArray[3] = transform2D.transformInverse(e);
         /**/
 //        ImageIO.write(transform2DToImage(componentArray), "png", new File("C:\\Users\\GuiR\\Documents/test out " + e + ".png"));
-        final MainFrame gui = new MainFrame() {
+        new MainFrame() {
 
             @Override
             public void onDataButtonPressed() {

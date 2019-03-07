@@ -258,7 +258,7 @@ public final class Transform2D implements TransformData{
 
     public static void main(String args[]) throws IOException {
         double x = 1 / sqrt(2);
-        Transform2D transform2D = new Transform2D(
+        new Transform2D(
          imageToMatrix(ImageIO.read(new File("C:/users/guir/documents/test.png")), 0),
          new double[]{ x,  x},
          new double[]{ x, -x},

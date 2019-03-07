@@ -1,6 +1,6 @@
 package io.github.guiritter.wavelet.gui;
 
-import io.github.guiritter.imagecomponent.ImageComponent;
+import io.github.guiritter.image_component.ImageComponent;
 import static io.github.guiritter.wavelet.Detail2D.DD;
 import static io.github.guiritter.wavelet.Main.create2ByteGrayAlphaImage;
 import static io.github.guiritter.wavelet.Main.normalize2DImage;

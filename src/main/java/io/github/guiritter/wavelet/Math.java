@@ -123,9 +123,9 @@ public final class Math {
 
     /**
      * Same as MATLAB's <code>conv(a, b, 'same')</code>.
-     * @param f
-     * @param g
-     * @return
+     * @param f values to be convoluted
+     * @param g values to be convoluted
+     * @return convolution of values
      */
     public static double[] convolutionSame(double f[], double g[]) {
         int N = f.length;

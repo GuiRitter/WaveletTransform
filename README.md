@@ -42,3 +42,5 @@ The "Data" button exports the current transform view to text.
 * 2D transform: Several color channels separated by the "D" character. Each color channel is a matrix array, separated by the "C" character. The first of these matrices represent the smoothed image, represented as mentioned before. The second matrix is a detail image array, separated by the "B" character. The first detail image represent the image filtered by the low pass filter in the vertical direction and the high pass filter in the horizontal direction. Second detail image: high pass in the vertical and low pass in the horizontal. Third detail image: high pass in the vertical and high pass in the horizontal. The rest is as mentioned before.
 
 The "Image" button exports the current transform view to an image file.
+
+[A few words about Maven.](https://gist.github.com/GuiRitter/1834bd024756e08ab422026a7cd24605)
