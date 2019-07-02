@@ -4,7 +4,7 @@
 
   <groupId>io.github.guiritter</groupId>
   <artifactId>wavelet-transform</artifactId> 
-  <version>1.0.1</version> 
+  <version>1.0.2</version> 
   <packaging>jar</packaging>
 
   <name>Wavelet Transform</name> 
@@ -40,6 +40,12 @@
   </repositories>
 
   <dependencies>
+    <dependency>
+      <groupId>com.github.GuiRitter</groupId>
+      <artifactId>FitLinear</artifactId>
+      <version>master-SNAPSHOT</version>
+    </dependency>
+
     <dependency>
       <groupId>com.github.GuiRitter</groupId>
       <artifactId>ImageComponent</artifactId>

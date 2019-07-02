@@ -25,6 +25,7 @@ import java.util.WeakHashMap;
 
 import javax.imageio.ImageIO;
 
+import io.github.guiritter.fit_linear.FitLinear;
 import io.github.guiritter.wavelet.gui.MainFrame;
 
 /**
